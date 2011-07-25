@@ -1,1 +1,1 @@
-from protocol import DendriteProtocol as Protocol
+from protocol import *

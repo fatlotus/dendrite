@@ -1,21 +1,40 @@
-from twisted.internet import protocol 
+from twisted.internet import protocol
+from dendrite.protocol import coding
+from dendrite.protocol import types
 import struct
 
 PACKET_HEADER = "!IBI"
 
 class DendriteServerProtocol(protocol.Protocol):
-	def packetReceived(self, message):
-		print "packet %i (type = %i) {" % (self.message_id, self.kind)
-		print "  reply %i" % self.reply
-		print "  contents %s" % repr(message)
-		print "}"
-	
-	def connectionMade(self):
+	def __init__(self):
 		self.buffer = ""
 		self.length = -1
-		self.message_id = 0
+		self.received_message_id = 1
+		self.sent_message_id = 0
 		self.reply = None
 		self.kind = None
+	
+	def packetReceived(self, message):
+		print "PACKET: %s" % types.FIELD_TYPES.get(self.kind, "(unknown kind)")
+	
+	def sendPacket(self, kind, reply=None, fields=[ ]):
+		if reply == None:
+			reply = self.sent_message_id
+		
+		field_types = zip(types.FIELD_TYPES[kind], fields)
+		message = coding.encode(field_types)
+		
+		header = struct.pack(PACKET_HEADER,
+			reply,
+			types.TYPE_IDS[kind],
+			len(message)
+		)
+		self.transport.write(header)
+		self.transport.write(message)
+		self.sent_message_id += 2
+	
+	def connectionMade(self):
+		self.connection.initialize_connection()
 	
 	def dataReceived(self, data):
 		self.buffer += data
@@ -35,7 +54,7 @@ class DendriteServerProtocol(protocol.Protocol):
 				if len(self.buffer) >= self.length:
 					self.packetReceived(self.buffer[:self.length])
 					self.length = -1
-					self.message_id += 2
+					self.received_message_id += 2
 				else:
 					break
 
@@ -44,5 +63,8 @@ class DendriteClientProtocol(protocol.Protocol):
 		self.transport.write(struct.pack(PACKET_HEADER, reply, kind, len(message)))
 		self.transport.write(message)
 	
+	def dataReceived(self, data):
+		print repr(data)
+	
 	def connectionMade(self):
-		self.sendPacket(0, 0x1, "Hello, world!")
+		pass
