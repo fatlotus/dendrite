@@ -1,0 +1,2 @@
+This repository holds the service code for mobile application communication.
+Dendrite communicates via socket while the application is in the foreground and via notification services when in the background.
