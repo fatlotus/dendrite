@@ -1,4 +1,5 @@
-from twisted.internet import protocol
+from OpenSSL import SSL
+from twisted.internet import protocol, ssl
 from dendrite.protocol import coding
 from dendrite.protocol import types
 import struct
@@ -57,9 +58,22 @@ class DendriteProtocol(protocol.Protocol):
       self.sent_message_id += 2
    
    def connectionMade(self):
-      def patched_send(kind, *fields):
+      def send(kind, *fields):
          self.sendPacket(kind, None, *fields)
-      self.connection.send = patched_send
+      
+      def startTLS(is_server=False):
+         if is_server:
+            ctx = ssl.DefaultOpenSSLContextFactory(
+               privateKeyFileName='keys/server.key',
+               certificateFileName='keys/server.crt'
+            )
+            self.transport.startTLS(ctx, self.factory)
+         else:
+            ctx = ssl.ClientContextFactory()
+            self.transport.startTLS(ctx, self.factory)
+      
+      self.connection.startTLS = startTLS
+      self.connection.send = send
       self.connection.initialize_connection()
    
    def dataReceived(self, data):
