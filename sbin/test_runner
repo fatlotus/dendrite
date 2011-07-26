@@ -1,0 +1,7 @@
+#!/bin/sh
+# Main Dendrite Unit Testing framework
+# 
+# This script launches the unittest tests for this
+# project and runs all of them.
+
+PYTHONPATH=src python src/dendrite/tests/__init__.py -v

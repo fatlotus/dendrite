@@ -22,7 +22,7 @@ class TestEncoding(unittest.TestCase):
       
       self.assertEqual(results, values, "before and after encoding not equal.")
    
-   def test_various_types(self):
+   def test_composite_types(self):
       self.verify()
       
       for a in TYPES:
