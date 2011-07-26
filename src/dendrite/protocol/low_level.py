@@ -93,6 +93,7 @@ class DendriteProtocol(protocol.Protocol):
          if self.length >= 0:
             if len(self.buffer) >= self.length:
                self.packetReceived(self.buffer[:self.length])
+               self.buffer = self.buffer[self.length:]
                self.length = -1
                self.received_message_id += 2
             else:
