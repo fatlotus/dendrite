@@ -57,7 +57,7 @@ def decode(string, kinds):
 			values = struct.unpack_from('!I', message)
 			offset += struct.calcsize('I')
 	
-	if offset != len(string) - 1:
+	if offset != len(string):
 		raise ValueError, "Garbage at the end of fields list."
 	
 	return values

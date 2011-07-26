@@ -1,8 +1,22 @@
 from twisted.internet import reactor # FIXME
 
 class ServerSideConnection():
-	def send(self, *vargs, **dargs):
-		self.protocol.sendPacket(*vargs, **dargs)
+	def heartbeat(self):
+		def handle_response(name, reply, cancel):
+			cancel()
+		self.send("echo", handle_response)
+		
+		reactor.callLater(1, self.heartbeat)
+	
+	def received_echo(self, reply):
+		pass
 	
 	def initialize_connection(self):
-		self.send("echo")
+		self.heartbeat()
+
+class ClientSideConnection():
+	def initialize_connection(self):
+		pass
+		
+	def received_echo(self, reply):
+		reply("echo")

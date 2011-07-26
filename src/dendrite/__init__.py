@@ -1,1 +1,1 @@
-from protocol import *
+import protocol
