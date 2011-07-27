@@ -33,8 +33,8 @@ class DendriteProtocol(protocol.Protocol):
             method = self.replies[reply_id]
             method(type_name, reply, cancel, *fields)
          except KeyError:
-            print self.received_message_id
-            print "Received a reply to a message I'm not waiting for: %i" % reply_id
+            raise ValueError("Received a reply to a message I'm not"
+             "waiting for: %i" % reply_id)
       else:
          method = getattr(self.connection, "received_%s" % type_name)
          method(reply, *fields)

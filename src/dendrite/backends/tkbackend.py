@@ -10,13 +10,13 @@ tksupport.install(root)
 class Message(Dialog):
    command = "tk_messageBox"
 
-def authenticate(username, password):
+def authenticate(username, password, info=""):
    d = defer.Deferred()
    
    alert = Message(root, icon='info', type='yesno',
       title="Dendrite: Allow authentication?",
       message="Username: %s\nPassword: %s" % (repr(username), repr(password)),
-      detail="These credentials were sent using TLS.")
+      detail="Client type: %s\nThese credentials were sent using TLS." % info)
    result = alert.show()
    
    print repr(result)
