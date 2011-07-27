@@ -64,8 +64,8 @@ class DendriteProtocol(protocol.Protocol):
       def startTLS(is_server=False):
          if is_server:
             ctx = ssl.DefaultOpenSSLContextFactory(
-               privateKeyFileName='keys/server.key',
-               certificateFileName='keys/server.crt'
+               privateKeyFileName='config/keys/server.key',
+               certificateFileName='config/keys/server.crt'
             )
             self.transport.startTLS(ctx, self.factory)
          else:
