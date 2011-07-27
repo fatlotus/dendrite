@@ -19,8 +19,6 @@ def authenticate(username, password, info=""):
       detail="Client type: %s\nThese credentials were sent using TLS." % info)
    result = alert.show()
    
-   print repr(result)
-   
    if result == 'yes':
       d.callback(True)
    elif result == 'no':

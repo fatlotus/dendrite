@@ -10,30 +10,33 @@ class ServerSideConnection():
       self._authenticated = False
    
    def heartbeat(self):
-      def handle_response(name, reply, cancel):
-         cancel()
-      self.send("echo", handle_response)
+      def handle_response(reply, cancel):
+         pass
+      self.send("echo", echo=handle_response)
       
       reactor.callLater(1, self.heartbeat)
    
    def received_login(self, reply_to_login, username, password):
-      def get_user_info_succeeded(name, reply_to_identity,
-       cancel, userAgent, deviceID):
-         if name == 'identity':
-            def login_succeeded(ignored):
-               reply_to_login("success")
-               self._authenticated = True
+      def try_authenticate(userAgent):
+         def login_succeeded(ignored):
+            reply_to_login("success")
+            self._authenticated = True
+   
+         def login_failed(err):
+            reply_to_login("failure", err.getErrorMessage())
+            self._authenticated = False
       
-            def login_failed(err):
-               reply_to_login("failure", err.getErrorMessage())
-               self._authenticated = False
-         
-            d = self._backend.authenticate(username, password, info=userAgent)
-            d.addCallback(login_succeeded)
-            d.addErrback(login_failed)
-            cancel()
+         d = self._backend.authenticate(username, password, info=userAgent)
+         d.addCallback(login_succeeded)
+         d.addErrback(login_failed)
       
-      self.send("identify", get_user_info_succeeded)
+      def identify_succeeded(reply, cancel, userAgent, deviceID):
+         try_authenticate(userAgent)
+      
+      def identify_failed(reply, cancel, err):
+         try_authenticate("(unknown)")
+      
+      self.send("identify", identity=identify_succeeded, failure=identify_failed)
    
    def received_fetch(self, reply, method, url):
       if self._authenticated:
@@ -54,20 +57,17 @@ class ClientSideConnection():
    def initialize_connection(self):
       self.startTLS(is_server=False)
       
-      def handle_response(name, reply, cancel, data):
-         if name == "data":
+      def handle_login_success(reply, cancel):
+         def handle_fetch(reply, cancel, data):
             print "data: %s" % data
-         elif name == 'failure':
-            print "** protocol error: %s **" % data
-         cancel()
+         
+         self.send("fetch", "GET", "/hello-world", data=handle_fetch)
       
-      def handle_authenticate(name, reply, cancel, *error):
-         if name == 'failure':
-            print "** login failure: %s **" % error[0]
-         else:
-            self.send("fetch", handle_response, "GET", "/hello-world")
+      def handle_login_failed(reply, cancel, error):
+         print "** Login failed: %s **" % error
       
-      self.send("login", handle_authenticate, "fred", "fredspassword")
+      self.send("login", "fred", "fredspassword",
+       success=handle_login_success, failure=handle_login_failed)
    
    def get_user_agent(self):
       return ("Test/Python %s.%s.%s" % (sys.version_info.major,

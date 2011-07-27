@@ -1,5 +1,5 @@
 from OpenSSL import SSL
-from twisted.internet import protocol, ssl
+from twisted.internet import protocol, ssl, defer
 from dendrite.protocol import coding
 from dendrite.protocol import types
 import struct
@@ -22,31 +22,52 @@ class DendriteProtocol(protocol.Protocol):
       fields = coding.decode(message, types.FIELD_TYPES[type_name])
       reply_id = self.reply
       
-      def reply(kind, *args):
-         self.sendPacket(kind, message_id, *args)
+      def reply(kind, *vargs, **dargs):
+         self.sendPacket(kind, reply=message_id, *vargs, **dargs)
       
       if reply_id != self.received_message_id:
-         def cancel():
-            del self.replies[reply_id]
-         
          try:
             method = self.replies[reply_id]
-            method(type_name, reply, cancel, *fields)
+            del self.replies[reply_id]
+            
+            def keep_waiting():
+               self.replies[reply_id] = method
+            
+            method(type_name, reply, keep_waiting, *fields)
          except KeyError:
-            raise ValueError("Received a reply to a message I'm not"
+            raise ValueError("Received a reply to a message I'm not "
              "waiting for: %i" % reply_id)
       else:
          method = getattr(self.connection, "received_%s" % type_name)
          method(reply, *fields)
    
-   def sendPacket(self, kind, reply=None, *fields):
+   def sendPacket(self, kind, *fields, **dargs):
+      reply = None
+      
+      if "reply" in dargs:
+         reply = dargs.get("reply", None)
+         del dargs["reply"]
+      
       if reply == None:
          reply = self.sent_message_id
       
-      if len(fields) >= 1 and callable(fields[0]):
-         self.replies[self.sent_message_id] = fields[0]
-         
-         fields = fields[1:]
+      if "response" in dargs:
+         response = dargs.get("response")
+      elif len(dargs) > 0:
+         def response(name, reply, cancel, *fields):
+            if name in dargs:
+               dargs[name](reply, cancel, *fields)
+            elif name == "failure":
+               raise ValueError("unexpected failure: %s" % fields[0])
+            else:
+               raise ValueError("unexpected response: %s" % name)
+      else:
+         def empty(*vargs, **dargs):
+            print "handle_unexpected_reply(*%s, **%s)" % (vargs, dargs)
+         response = None # empty
+      
+      if response:
+         self.replies[self.sent_message_id] = response
       
       field_types = zip(types.FIELD_TYPES[kind], fields)
       message = coding.encode(field_types)
@@ -58,8 +79,8 @@ class DendriteProtocol(protocol.Protocol):
       self.sent_message_id += 2
    
    def connectionMade(self):
-      def send(kind, *fields):
-         self.sendPacket(kind, None, *fields)
+      def send(*vargs, **dargs):
+         self.sendPacket(reply=None, *vargs, **dargs)
       
       def startTLS(is_server=False):
          if is_server:
