@@ -4,16 +4,17 @@ FIELD_TYPES = {
    "data" : (dict,),
    "starttls" : (),
    "success" : (),
-   "failed" : (str,),
+   "failure" : (str,),
+   "login" : (str, str)
 }
 
 TYPE_IDS = {
    "echo" : 0x1,
    "fetch" : 0x2,
    "data" : 0x8,
-   "starttls" : 0x5,
    "success" : 0xA,
-   "failed" : 0xB,
+   "failure" : 0xB,
+   "login" : 0x9
 }
 
 INVERTED_TYPE_IDS = dict([v,k] for k,v in TYPE_IDS.items())
