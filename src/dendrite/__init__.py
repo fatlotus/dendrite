@@ -7,5 +7,6 @@ with warnings.catch_warnings():
       # This statement ignores deprecation warning about the
       # md5 module, since Tk and others on OS X depend on it.
 
+from dendrite import backends
 import protocol
 import tests

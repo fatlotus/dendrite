@@ -36,7 +36,8 @@ class ServerSideConnection():
       def identify_failed(reply, cancel, err):
          try_authenticate("(unknown)")
       
-      self.send("identify", identity=identify_succeeded, failure=identify_failed)
+      self.send("identify", identity=identify_succeeded,
+       failure=identify_failed)
    
    def received_fetch(self, reply, method, url):
       if self._authenticated:
@@ -52,18 +53,42 @@ class ServerSideConnection():
       else:
          reply("failure", "The fetch command requires authentication.")
    
+   def received_listen(self, reply_to_listen, method, url):
+      upstream_cancel = None
+      
+      def handle_cancel(reply_to_cancel, keep_waiting):
+         upstream_cancel()
+      
+      def got_new_data(notification_type, data):
+         reply_to_listen("notify", notification_type, data, cancel=handle_cancel)
+      
+      reply_to_listen("success", cancel=handle_cancel)
+      upstream_cancel = self._backend.listen(method, url, '', '', got_new_data)
+   
 
 class ClientSideConnection():
    def initialize_connection(self):
       self.startTLS(is_server=False)
       
-      def handle_login_success(reply, cancel):
-         def handle_fetch(reply, cancel, data):
-            print "data: %s" % data
+      def handle_login_success(reply, keep_waiting):
+         def handle_successful_listen(reply, keep_waiting):
+            keep_waiting()
          
-         self.send("fetch", "GET", "/hello-world", data=handle_fetch)
+         def handle_notify(reply_to_notify, keep_waiting, notification_type, data):
+            if data.get("count", 0) >= 5:
+               print "Sending a cancel message-"
+               reply_to_notify("cancel")
+            else:
+               print "%s: %s" % (notification_type, data)
+               keep_waiting()
+         
+         self.send("listen", "GET", "/hello-world",
+          success=handle_successful_listen, notify=handle_notify)
+         
+         self.send("listen", "GET", "/hello-world-2",
+          success=handle_successful_listen, notify=handle_notify)
       
-      def handle_login_failed(reply, cancel, error):
+      def handle_login_failed(reply, keep_waiting, error):
          print "** Login failed: %s **" % error
       
       self.send("login", "fred", "fredspassword",
