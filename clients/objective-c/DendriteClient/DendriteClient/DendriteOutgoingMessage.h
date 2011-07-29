@@ -9,8 +9,11 @@
 #import <Foundation/Foundation.h>
 #import "DendriteClient.h"
 
-@interface DendriteOutgoingMessage : NSObject
+@interface DendriteOutgoingMessage : NSObject {
+    NSInvocation * responseTable[kDendriteHighestTypeIDPlusOne];
+    DendriteClient * parentClient;
+}
 
-- (void)respondToReply:(DendriteMessageType*)type withSelector:(SEL)selector;
+- (void)respondToReply:(DendriteMessageType)type withSelector:(SEL)selector;
 
 @end

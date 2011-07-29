@@ -9,7 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "DendriteClient.h"
 
-@interface DendriteIncomingMessage : NSObject
+@interface DendriteIncomingMessage : NSObject {
+    NSUInteger messageID;
+    DendriteClient * parentClient;
+}
 
 - (DendriteOutgoingMessage *)replyWithType:(DendriteMessageType)type andArguments:(id)argument, ...;
 

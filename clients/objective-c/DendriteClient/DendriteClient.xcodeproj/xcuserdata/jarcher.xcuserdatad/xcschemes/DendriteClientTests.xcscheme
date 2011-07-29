@@ -4,22 +4,6 @@
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
-      <BuildActionEntries>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "NO"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "704522E113E9F42B004B8958"
-               BuildableName = "libDendriteClient.a"
-               BlueprintName = "DendriteClient"
-               ReferencedContainer = "container:DendriteClient.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-      </BuildActionEntries>
    </BuildAction>
    <TestAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.GDB"
@@ -31,9 +15,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "70490BE413E2F97500A5258F"
+               BlueprintIdentifier = "704522EF13E9F42B004B8958"
                BuildableName = "DendriteClientTests.octest"
-               BlueprintName = "DendriteClientOSXTests"
+               BlueprintName = "DendriteClientIOSTests"
                ReferencedContainer = "container:DendriteClient.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -44,7 +28,7 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.GDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Release">
+      buildConfiguration = "Debug">
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
