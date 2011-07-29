@@ -38,7 +38,7 @@ def listen(method, url, query_string, body, respond):
    
    Label(window, text="URL:").grid(row=0, column=0, sticky=E)
    Label(window, text="Query string:").grid(row=1, column=0, sticky=E)
-   Label(window, text="Body:").grid(row=2, column=0, sticky=E)
+   Label(window, text="Request Body:").grid(row=2, column=0, sticky=E)
    
    mono = ("Monaco", 14)
    

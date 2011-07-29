@@ -23,7 +23,7 @@ class ServerSideConnection():
             self._authenticated = True
    
          def login_failed(err):
-            reply_to_login("failure", err.getErrorMessage())
+            reply_to_login("failure", "LoginFailed", err.getErrorMessage())
             self._authenticated = False
       
          d = self._backend.authenticate(username, password, info=userAgent)
@@ -45,7 +45,7 @@ class ServerSideConnection():
             reply("data", data)
          
          def failed(err):
-            reply("failure", err.getErrorMessage())
+            reply("failure", "FetchFailed", err.getErrorMessage())
          
          d = self._backend.fetch(method, url, '', '')
          d.addCallback(fetch_response)
@@ -88,8 +88,8 @@ class ClientSideConnection():
          self.send("listen", "GET", "/hello-world-2",
           success=handle_successful_listen, notify=handle_notify)
       
-      def handle_login_failed(reply, keep_waiting, error):
-         print "** Login failed: %s **" % error
+      def handle_login_failed(reply, keep_waiting, error, description):
+         print "** Login failed: %s **" % description
       
       self.send("login", "fred", "fredspassword",
        success=handle_login_success, failure=handle_login_failed)

@@ -4,7 +4,7 @@ FIELD_TYPES = {
    "data" : (dict,),
    "starttls" : (),
    "success" : (),
-   "failure" : (str,),
+   "failure" : (str,str),
    "login" : (str, str),
    "identify" : (),
    "identity" : (str, str),

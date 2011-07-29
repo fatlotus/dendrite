@@ -1,0 +1,458 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		70490BD113E2F97500A5258F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70490BD013E2F97500A5258F /* Cocoa.framework */; };
+		70490BDB13E2F97500A5258F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 70490BD913E2F97500A5258F /* InfoPlist.strings */; };
+		70490BDF13E2F97500A5258F /* DendriteClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 70490BDE13E2F97500A5258F /* DendriteClient.m */; };
+		70490BE713E2F97500A5258F /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70490BE613E2F97500A5258F /* SenTestingKit.framework */; };
+		70490BE813E2F97500A5258F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70490BD013E2F97500A5258F /* Cocoa.framework */; };
+		70490BEB13E2F97500A5258F /* DendriteClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70490BCD13E2F97500A5258F /* DendriteClient.framework */; };
+		70490BF113E2F97500A5258F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 70490BEF13E2F97500A5258F /* InfoPlist.strings */; };
+		70490BF313E2F97500A5258F /* DendriteClientTests.h in Resources */ = {isa = PBXBuildFile; fileRef = 70490BF213E2F97500A5258F /* DendriteClientTests.h */; };
+		70490BF513E2F97500A5258F /* DendriteClientTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 70490BF413E2F97500A5258F /* DendriteClientTests.m */; };
+		70490C0013E2F9DA00A5258F /* DendriteIncomingMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 70490BFE13E2F9DA00A5258F /* DendriteIncomingMessage.h */; };
+		70490C0113E2F9DA00A5258F /* DendriteIncomingMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 70490BFF13E2F9DA00A5258F /* DendriteIncomingMessage.m */; };
+		70490C0413E2FB1B00A5258F /* DendriteOutgoingMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 70490C0213E2FB1B00A5258F /* DendriteOutgoingMessage.h */; };
+		70490C0513E2FB1B00A5258F /* DendriteOutgoingMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 70490C0313E2FB1B00A5258F /* DendriteOutgoingMessage.m */; };
+		70490C0813E3069400A5258F /* AsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 70490C0613E3069400A5258F /* AsyncSocket.h */; };
+		70490C0913E3069400A5258F /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 70490C0713E3069400A5258F /* AsyncSocket.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		70490BE913E2F97500A5258F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 70490BC313E2F97500A5258F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 70490BCC13E2F97500A5258F;
+			remoteInfo = DendriteClient;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		70490BCD13E2F97500A5258F /* DendriteClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DendriteClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		70490BD013E2F97500A5258F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		70490BD313E2F97500A5258F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		70490BD413E2F97500A5258F /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		70490BD513E2F97500A5258F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		70490BD813E2F97500A5258F /* DendriteClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DendriteClient-Info.plist"; sourceTree = "<group>"; };
+		70490BDA13E2F97500A5258F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		70490BDC13E2F97500A5258F /* DendriteClient-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DendriteClient-Prefix.pch"; sourceTree = "<group>"; };
+		70490BDD13E2F97500A5258F /* DendriteClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DendriteClient.h; sourceTree = "<group>"; };
+		70490BDE13E2F97500A5258F /* DendriteClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DendriteClient.m; sourceTree = "<group>"; };
+		70490BE513E2F97500A5258F /* DendriteClientTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DendriteClientTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		70490BE613E2F97500A5258F /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		70490BEE13E2F97500A5258F /* DendriteClientTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DendriteClientTests-Info.plist"; sourceTree = "<group>"; };
+		70490BF013E2F97500A5258F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		70490BF213E2F97500A5258F /* DendriteClientTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DendriteClientTests.h; sourceTree = "<group>"; };
+		70490BF413E2F97500A5258F /* DendriteClientTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DendriteClientTests.m; sourceTree = "<group>"; };
+		70490BFE13E2F9DA00A5258F /* DendriteIncomingMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DendriteIncomingMessage.h; sourceTree = "<group>"; };
+		70490BFF13E2F9DA00A5258F /* DendriteIncomingMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DendriteIncomingMessage.m; sourceTree = "<group>"; };
+		70490C0213E2FB1B00A5258F /* DendriteOutgoingMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DendriteOutgoingMessage.h; sourceTree = "<group>"; };
+		70490C0313E2FB1B00A5258F /* DendriteOutgoingMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DendriteOutgoingMessage.m; sourceTree = "<group>"; };
+		70490C0613E3069400A5258F /* AsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncSocket.h; sourceTree = "<group>"; };
+		70490C0713E3069400A5258F /* AsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncSocket.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		70490BC913E2F97500A5258F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70490BD113E2F97500A5258F /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		70490BE113E2F97500A5258F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70490BE713E2F97500A5258F /* SenTestingKit.framework in Frameworks */,
+				70490BE813E2F97500A5258F /* Cocoa.framework in Frameworks */,
+				70490BEB13E2F97500A5258F /* DendriteClient.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		70490BC113E2F97500A5258F = {
+			isa = PBXGroup;
+			children = (
+				70490BD613E2F97500A5258F /* DendriteClient */,
+				70490BEC13E2F97500A5258F /* DendriteClientTests */,
+				70490BCF13E2F97500A5258F /* Frameworks */,
+				70490BCE13E2F97500A5258F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		70490BCE13E2F97500A5258F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				70490BCD13E2F97500A5258F /* DendriteClient.framework */,
+				70490BE513E2F97500A5258F /* DendriteClientTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		70490BCF13E2F97500A5258F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				70490BD013E2F97500A5258F /* Cocoa.framework */,
+				70490BE613E2F97500A5258F /* SenTestingKit.framework */,
+				70490BD213E2F97500A5258F /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		70490BD213E2F97500A5258F /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				70490BD313E2F97500A5258F /* AppKit.framework */,
+				70490BD413E2F97500A5258F /* CoreData.framework */,
+				70490BD513E2F97500A5258F /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		70490BD613E2F97500A5258F /* DendriteClient */ = {
+			isa = PBXGroup;
+			children = (
+				70490BDD13E2F97500A5258F /* DendriteClient.h */,
+				70490BDE13E2F97500A5258F /* DendriteClient.m */,
+				70490BFE13E2F9DA00A5258F /* DendriteIncomingMessage.h */,
+				70490BFF13E2F9DA00A5258F /* DendriteIncomingMessage.m */,
+				70490C0213E2FB1B00A5258F /* DendriteOutgoingMessage.h */,
+				70490C0313E2FB1B00A5258F /* DendriteOutgoingMessage.m */,
+				70490C0613E3069400A5258F /* AsyncSocket.h */,
+				70490C0713E3069400A5258F /* AsyncSocket.m */,
+				70490BD713E2F97500A5258F /* Supporting Files */,
+			);
+			path = DendriteClient;
+			sourceTree = "<group>";
+		};
+		70490BD713E2F97500A5258F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				70490BD813E2F97500A5258F /* DendriteClient-Info.plist */,
+				70490BD913E2F97500A5258F /* InfoPlist.strings */,
+				70490BDC13E2F97500A5258F /* DendriteClient-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		70490BEC13E2F97500A5258F /* DendriteClientTests */ = {
+			isa = PBXGroup;
+			children = (
+				70490BF213E2F97500A5258F /* DendriteClientTests.h */,
+				70490BF413E2F97500A5258F /* DendriteClientTests.m */,
+				70490BED13E2F97500A5258F /* Supporting Files */,
+			);
+			path = DendriteClientTests;
+			sourceTree = "<group>";
+		};
+		70490BED13E2F97500A5258F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				70490BEE13E2F97500A5258F /* DendriteClientTests-Info.plist */,
+				70490BEF13E2F97500A5258F /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		70490BCA13E2F97500A5258F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70490C0013E2F9DA00A5258F /* DendriteIncomingMessage.h in Headers */,
+				70490C0413E2FB1B00A5258F /* DendriteOutgoingMessage.h in Headers */,
+				70490C0813E3069400A5258F /* AsyncSocket.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		70490BCC13E2F97500A5258F /* DendriteClient */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 70490BF813E2F97500A5258F /* Build configuration list for PBXNativeTarget "DendriteClient" */;
+			buildPhases = (
+				70490BC813E2F97500A5258F /* Sources */,
+				70490BC913E2F97500A5258F /* Frameworks */,
+				70490BCA13E2F97500A5258F /* Headers */,
+				70490BCB13E2F97500A5258F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DendriteClient;
+			productName = DendriteClient;
+			productReference = 70490BCD13E2F97500A5258F /* DendriteClient.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		70490BE413E2F97500A5258F /* DendriteClientTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 70490BFB13E2F97500A5258F /* Build configuration list for PBXNativeTarget "DendriteClientTests" */;
+			buildPhases = (
+				70490BE013E2F97500A5258F /* Sources */,
+				70490BE113E2F97500A5258F /* Frameworks */,
+				70490BE213E2F97500A5258F /* Resources */,
+				70490BE313E2F97500A5258F /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				70490BEA13E2F97500A5258F /* PBXTargetDependency */,
+			);
+			name = DendriteClientTests;
+			productName = DendriteClientTests;
+			productReference = 70490BE513E2F97500A5258F /* DendriteClientTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		70490BC313E2F97500A5258F /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 70490BC613E2F97500A5258F /* Build configuration list for PBXProject "DendriteClient" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 70490BC113E2F97500A5258F;
+			productRefGroup = 70490BCE13E2F97500A5258F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				70490BCC13E2F97500A5258F /* DendriteClient */,
+				70490BE413E2F97500A5258F /* DendriteClientTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		70490BCB13E2F97500A5258F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70490BDB13E2F97500A5258F /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		70490BE213E2F97500A5258F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70490BF113E2F97500A5258F /* InfoPlist.strings in Resources */,
+				70490BF313E2F97500A5258F /* DendriteClientTests.h in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		70490BE313E2F97500A5258F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		70490BC813E2F97500A5258F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70490BDF13E2F97500A5258F /* DendriteClient.m in Sources */,
+				70490C0113E2F9DA00A5258F /* DendriteIncomingMessage.m in Sources */,
+				70490C0513E2FB1B00A5258F /* DendriteOutgoingMessage.m in Sources */,
+				70490C0913E3069400A5258F /* AsyncSocket.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		70490BE013E2F97500A5258F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70490BF513E2F97500A5258F /* DendriteClientTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		70490BEA13E2F97500A5258F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 70490BCC13E2F97500A5258F /* DendriteClient */;
+			targetProxy = 70490BE913E2F97500A5258F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		70490BD913E2F97500A5258F /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				70490BDA13E2F97500A5258F /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		70490BEF13E2F97500A5258F /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				70490BF013E2F97500A5258F /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		70490BF613E2F97500A5258F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		70490BF713E2F97500A5258F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		70490BF913E2F97500A5258F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "DendriteClient/DendriteClient-Prefix.pch";
+				INFOPLIST_FILE = "DendriteClient/DendriteClient-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Debug;
+		};
+		70490BFA13E2F97500A5258F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "DendriteClient/DendriteClient-Prefix.pch";
+				INFOPLIST_FILE = "DendriteClient/DendriteClient-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
+		70490BFC13E2F97500A5258F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "DendriteClient/DendriteClient-Prefix.pch";
+				INFOPLIST_FILE = "DendriteClientTests/DendriteClientTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		70490BFD13E2F97500A5258F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "DendriteClient/DendriteClient-Prefix.pch";
+				INFOPLIST_FILE = "DendriteClientTests/DendriteClientTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		70490BC613E2F97500A5258F /* Build configuration list for PBXProject "DendriteClient" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				70490BF613E2F97500A5258F /* Debug */,
+				70490BF713E2F97500A5258F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		70490BF813E2F97500A5258F /* Build configuration list for PBXNativeTarget "DendriteClient" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				70490BF913E2F97500A5258F /* Debug */,
+				70490BFA13E2F97500A5258F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		70490BFB13E2F97500A5258F /* Build configuration list for PBXNativeTarget "DendriteClientTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				70490BFC13E2F97500A5258F /* Debug */,
+				70490BFD13E2F97500A5258F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 70490BC313E2F97500A5258F /* Project object */;
+}
