@@ -6,7 +6,7 @@
 //  Copyright 2011 University of Chicago CI. All rights reserved.
 //
 
-#import "DendriteIncomingMessage.h"
+#import "DendriteClient.h"
 
 #pragma mark Private accessors
 @interface DendriteIncomingMessage (hidden)

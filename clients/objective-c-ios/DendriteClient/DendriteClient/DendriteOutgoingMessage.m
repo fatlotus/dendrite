@@ -3,10 +3,10 @@
 //  DendriteClient
 //
 //  Created by Jeremy Archer on 7/29/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 University of Chicago CI. All rights reserved.
 //
 
-#import "DendriteOutgoingMessage.h"
+#import "DendriteClient.h"
 
 @interface DendriteOutgoingMessage (hidden)
 
