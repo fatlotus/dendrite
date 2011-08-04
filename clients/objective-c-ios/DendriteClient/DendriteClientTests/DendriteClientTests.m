@@ -8,16 +8,6 @@
 
 #import "DendriteClientTests.h"
 #import "DendriteClient.h"
-#import "DendriteIncomingMessage.h"
-#import "DendriteOutgoingMessage.h"
-
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#import <UIKit/UIKit.h>
-#import <Foundation/Foundation.h>
-#else
-#import <CoreServices/CoreServices.h>
-#endif
-
 
 #pragma mark - Test Implementation
 @implementation DendriteClientTests
@@ -57,24 +47,8 @@
 - (void)handleIdentify:(DendriteIncomingMessage *)msg {
     NSString * userAgent, * deviceIdentifier;
     
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-    UIDevice * device = [UIDevice currentDevice];
-    
-    userAgent = [NSString stringWithFormat:@"%@ %@/%@ \"%@\"", [device systemName], [device systemVersion], [device localizedModel], [device name]];
-    
-    deviceIdentifier = [device uniqueIdentifier];
-#else
-    SInt32 major, minor, bugfix;
-    
-    Gestalt(gestaltSystemVersionMajor, &major);
-    Gestalt(gestaltSystemVersionMinor, &minor);
-    Gestalt(gestaltSystemVersionBugFix, &bugfix);
-    
-    userAgent = [NSString stringWithFormat:@"Mac OS X %d.%d.%d", major, minor, bugfix];
-    deviceIdentifier = @"";
-#endif
-    
-    NSLog(@"message: %@", msg);
+    userAgent = [DendriteClient generateUserAgentString];
+    deviceIdentifier = [DendriteClient generateDeviceIDString];
     
     [msg replyWithType:TypeIdentity andArguments:userAgent, deviceIdentifier];
 }

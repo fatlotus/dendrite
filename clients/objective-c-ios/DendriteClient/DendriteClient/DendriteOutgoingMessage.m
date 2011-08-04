@@ -17,12 +17,17 @@
 
 @implementation DendriteOutgoingMessage
 
+@synthesize respondingToMessage, userInfo;
+
 - (id)initWithDendriteClient:(DendriteClient *)client
 {
     self = [super init];
     
     if (self != nil) {
         parentClient = client;
+        
+        respondingToMessage = nil;
+        userInfo = nil;
     }
     
     return self;

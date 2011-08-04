@@ -27,6 +27,8 @@
 
 @implementation DendriteIncomingMessage
 
+@synthesize respondingToMessage, userInfo;
+
 - (id)initWithClient:(DendriteClient *)client
         andMessageID:(NSUInteger)theMessageID
 {
@@ -35,6 +37,9 @@
     if (self != nil) {
         parentClient = client;
         messageID = theMessageID;
+        
+        respondingToMessage = nil;
+        userInfo = nil;
     }
     
     return self;
@@ -59,7 +64,11 @@
     
     va_end(args);
     
-    return [parentClient sendMessage:type withReplyTo:messageID andArguments:argumentsAsArray];
+    DendriteOutgoingMessage * message = [parentClient sendMessage:type withReplyTo:messageID andArguments:argumentsAsArray];
+    
+    message.respondingToMessage = self;
+    
+    return message;
 }
 
 @end

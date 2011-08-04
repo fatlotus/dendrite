@@ -9,6 +9,13 @@
 #import "DendriteClient.h"
 #import "AsyncSocket.h"
 
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#else
+#import <CoreServices/CoreServices.h>
+#endif
+
 #pragma mark Array Initializers (hidden)
 
 DendriteMessageType dendriteMessageTypeTable[] = {
@@ -18,7 +25,7 @@ DendriteMessageType dendriteMessageTypeTable[] = {
     /*0x03*/ TypeListen,
     /*0x04*/ TypeNotify,
     /*0x05*/ TypeCancel,
-    /*0x06*/ _none,
+    /*0x06*/ TypeSession,
     /*0x07*/ _none,
     /*0x08*/ TypeData,
     /*0x09*/ TypeLogin,
@@ -45,7 +52,7 @@ char * dendriteMessageArgumentTypesTable[] = {
     /*0x03*/ "ss",
     /*0x04*/ "sd",
     /*0x05*/ "",
-    /*0x06*/ "!",
+    /*0x06*/ "",
     /*0x07*/ "!",
     /*0x08*/ "d",
     /*0x09*/ "ss",
@@ -109,6 +116,35 @@ char * dendriteMessageArgumentTypesTable[] = {
     
     [NSException raise:@"UndefinedType" format:@"Unknown message type."];
     return 0;
+}
+
+#pragma mark - User Agent Helpers
+
++ (NSString *)generateUserAgentString {
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+    UIDevice * device = [UIDevice currentDevice];
+    
+    return [NSString stringWithFormat:@"%@ %@/%@ \"%@\"", [device systemName], [device systemVersion], [device localizedModel], [device name]];
+#else
+    SInt32 major, minor, bugfix;
+    
+    Gestalt(gestaltSystemVersionMajor, &major);
+    Gestalt(gestaltSystemVersionMinor, &minor);
+    Gestalt(gestaltSystemVersionBugFix, &bugfix);
+    
+    return [NSString stringWithFormat:@"Mac OS X %d.%d.%d", major, minor, bugfix];
+#endif
+
+}
+
++ (NSString *)generateDeviceIDString {
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+    UIDevice * device = [UIDevice currentDevice];
+    
+    return [device uniqueIdentifier];
+#else
+    return @"";
+#endif
 }
 
 #pragma mark - Constructors
@@ -286,6 +322,8 @@ char * dendriteMessageArgumentTypesTable[] = {
             
             DendriteOutgoingMessage * message = [messageResponseHandlers objectForKey:[NSNumber numberWithUnsignedLong:incomingMessageReplyTo]];
             
+            incomingMessage.respondingToMessage = message;
+            
             if (message == nil) {
                 [NSException raise:@"UnknownResponse" format:@"Got message in reply to unknown message."];
             }
@@ -308,6 +346,7 @@ char * dendriteMessageArgumentTypesTable[] = {
         id result;
         BOOL boolResult;
         uint32_t int32;
+        uint16_t int16;
         uint8_t int8;
         
         o = 0;
@@ -319,13 +358,12 @@ char * dendriteMessageArgumentTypesTable[] = {
                 case 's':
                 case 'd':
                     
-                    [data getBytes:&int32 range:NSMakeRange(o,4)];
-                    int32 = ntohl(int32);
-                    NSLog(@"int32: %i", int32);
+                    [data getBytes:&int16 range:NSMakeRange(o,2)];
+                    int16 = ntohs(int16);
                     
-                    o += 4;
-                    stringRead = [[NSString alloc] initWithData:[data subdataWithRange:NSMakeRange(o, int32)] encoding:NSUTF8StringEncoding];
-                    o += int32;
+                    o += 2;
+                    stringRead = [[NSString alloc] initWithData:[data subdataWithRange:NSMakeRange(o, int16)] encoding:NSUTF8StringEncoding];
+                    o += int16;
                     
                     if (fieldTypes[i] == 'd') {
                         result = [stringRead JSONValue];

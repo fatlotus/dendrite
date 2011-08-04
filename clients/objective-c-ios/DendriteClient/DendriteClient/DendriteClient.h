@@ -33,6 +33,7 @@ typedef enum {
     TypeFailure,
     TypeIdentity,
     TypeIdentify,
+    TypeSession
 } DendriteMessageType;
 
 #define kDendriteHighestTypeIDPlusOne 0x0E
@@ -52,6 +53,12 @@ extern char * dendriteMessageArgumentTypesTable[];
     DendriteClient * parentClient;
 }
 
+- (DendriteOutgoingMessage *)replyWithType:(DendriteMessageType)type
+                              andArguments:(id)argument, ...;
+
+@property (nonatomic, readwrite, retain) DendriteOutgoingMessage * respondingToMessage;
+@property (nonatomic, retain) id userInfo;
+
 @end
 
 @interface DendriteOutgoingMessage : NSObject {
@@ -60,6 +67,9 @@ extern char * dendriteMessageArgumentTypesTable[];
 }
 
 - (void)respondToReply:(DendriteMessageType)type withSelector:(SEL)selector;
+
+@property (nonatomic, readwrite, retain) DendriteIncomingMessage * respondingToMessage;
+@property (nonatomic, retain) id userInfo;
 
 @end
 
@@ -81,6 +91,8 @@ extern char * dendriteMessageArgumentTypesTable[];
 
 #pragma mark - Static Helpers
 
++ (NSString *)generateUserAgentString;
++ (NSString *)generateDeviceIDString;
 + (DendriteMessageType)typeFromTypeID:(NSUInteger)typeID;
 + (NSUInteger)typeIDFromType:(DendriteMessageType)type;
 
