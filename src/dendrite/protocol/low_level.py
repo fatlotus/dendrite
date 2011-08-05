@@ -35,8 +35,9 @@ class DendriteProtocol(protocol.Protocol):
             
             method(type_name, reply, keep_waiting, *fields)
          except KeyError:
-            raise ValueError("Received a reply to a message I'm not "
-             "waiting for: %i" % reply_id)
+            raise ValueError("%s received a reply to a message not "
+             "waited for: %i" % ("Server" if self.is_server_side else "Client",
+              reply_id))
       else:
          method = getattr(self.connection, "received_%s" % type_name)
          method(reply, *fields)
@@ -69,12 +70,12 @@ class DendriteProtocol(protocol.Protocol):
       if response:
          self.replies[self.sent_message_id] = response
       
-      field_types = zip(types.FIELD_TYPES[kind], fields)
-      message = coding.encode(field_types)
+      message = coding.encode(types.FIELD_TYPES[kind], fields)
       
       header = struct.pack(PACKET_HEADER, reply, types.TYPE_IDS[kind], len(message))
       
-      print "C<-S %s" % repr(dict(id=self.sent_message_id, reply=reply, kind=kind, body=message))
+      if self.is_server_side:
+         print "C<-S %s" % repr(dict(id=self.sent_message_id, reply=reply, kind=kind, body=message))
       
       self.transport.write(header)
       self.transport.write(message)
@@ -115,7 +116,8 @@ class DendriteProtocol(protocol.Protocol):
 
          if self.length >= 0:
             if len(self.buffer) >= self.length:
-               print "C->S %s" % repr(dict(id=self.received_message_id, reply=self.reply, kind=self.kind, body=self.buffer[:self.length]))
+               if self.is_server_side:
+                  print "C->S %s" % repr(dict(id=self.received_message_id, reply=self.reply, kind=types.INVERTED_TYPE_IDS[self.kind], body=self.buffer[:self.length]))
                self.packetReceived(self.buffer[:self.length])
                self.buffer = self.buffer[self.length:]
                self.length = -1

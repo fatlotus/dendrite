@@ -8,6 +8,7 @@
 
 #import "DendriteClientTests.h"
 #import "DendriteClient.h"
+#import "SBJson.h"
 
 #pragma mark - Test Implementation
 @implementation DendriteClientTests
@@ -61,16 +62,25 @@
     [message respondToReply:TypeFailure withSelector:@selector(loginFailed:failure:description:)];
 }
 
-- (void)loginSuccessful:(DendriteIncomingMessage *)_ {
+- (void)handleSessionData:(DendriteClient *)_ data:(NSDictionary *)data {
     [testHelper triggerEvent:@"login"];
     
-    NSLog(@"Login successful.");
+    NSLog(@"Login successful.", data);
+}
+
+- (void)loginSuccessful:(DendriteIncomingMessage *)message {
+    DendriteOutgoingMessage * outgoing = [client sendMessage:TypeSession withArguments:nil];
+    [outgoing respondToReply:TypeData withSelector:@selector(handleSessionData:data:)];
 }
 
 - (void)loginFailed:(DendriteIncomingMessage*)_ failure:(NSString*)failure description:(NSString*)description {
     [testHelper triggerEvent:@"login"];
     
     NSLog(@"Login failed: %@", description);
+}
+
+- (void)unconnectedWithClient:(DendriteClient *)client {
+    NSLog(@"Unable to connect to server.");
 }
 
 @end

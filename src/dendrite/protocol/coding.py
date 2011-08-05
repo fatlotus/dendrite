@@ -7,10 +7,14 @@ import json
 # Annotated values is a zipped list of tuples (type, value)
 # where type is the type "value" should be cast to and "value"
 # is the value to be cast.
-def encode(annotated_values):
+def encode(types, values):
+   if len(types) != len(values):
+      raise ValueError("Argument count mismatch: got %i instead of %i" %
+         (len(values), len(types)))
+   
    fragments = [ ]
    
-   for (kind, value) in annotated_values:
+   for (kind, value) in zip(types, values):
       if type(kind) is type:
          if type(value) is not kind:
             raise TypeError, "value %s must of be of type %s" % (value, kind)

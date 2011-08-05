@@ -46,6 +46,7 @@ extern char * dendriteMessageArgumentTypesTable[];
 
 @protocol DendriteClientDelegate
 - (void)connectedWithClient:(DendriteClient *)client;
+- (void)unconnectedWithClient:(DendriteClient *)client;
 @end
 
 @interface DendriteIncomingMessage : NSObject {
@@ -83,6 +84,9 @@ extern char * dendriteMessageArgumentTypesTable[];
     NSUInteger incomingMessageNonce, outgoingMessageNonce;
     id<DendriteClientDelegate> delegate;
     NSUInteger incomingMessageTypeID, incomingMessageReplyTo;
+    NSString * connectingHost;
+    uint16_t connectingPort;
+    BOOL disconnected;
 }
 
 #pragma mark Constructors
@@ -103,6 +107,10 @@ extern char * dendriteMessageArgumentTypesTable[];
 
 - (void)handleMessages:(DendriteMessageType)type
           withSelector:(SEL)selector;
+
+- (BOOL)didConnectionFail;
+
+- (void)attemptReconnect;
 
 @property (nonatomic, readonly, assign) id<DendriteClientDelegate> delegate;
 

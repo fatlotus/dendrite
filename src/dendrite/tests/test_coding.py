@@ -18,7 +18,7 @@ class TestEncoding(unittest.TestCase):
    
    def verify(self, *kinds):
       values = [ self.initialize_type(kind) for kind in kinds ]
-      results = list(coding.decode(coding.encode(zip(kinds, values)), kinds))
+      results = list(coding.decode(coding.encode(kinds, values), kinds))
       
       self.assertEqual(results, values, "before and after encoding not equal.")
    

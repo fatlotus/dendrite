@@ -48,7 +48,7 @@ DendriteMessageType dendriteMessageTypeTable[] = {
 char * dendriteMessageArgumentTypesTable[] = {
     /*0x00*/ "!",
     /*0x01*/ "",
-    /*0x02*/ "ss",
+    /*0x02*/ "ssss",
     /*0x03*/ "ss",
     /*0x04*/ "sd",
     /*0x05*/ "",
@@ -162,11 +162,16 @@ char * dendriteMessageArgumentTypesTable[] = {
         
         delegate = defaultDelegate;
         
+        disconnected = NO;
+        
         incomingMessageNonce = 0;
         outgoingMessageNonce = 1;
         
         socket = [[AsyncSocket alloc] initWithDelegate:self];
         [socket connectToHost:host onPort:(uint16_t)port withTimeout:kDendriteClientDefaultTimeout error:nil];
+        
+        connectingHost = [host retain];
+        connectingPort = port;
         
         NSMutableDictionary * tlsOptions = [NSMutableDictionary dictionaryWithCapacity:1];
         [tlsOptions setObject:kCFBooleanFalse forKey:kCFStreamSSLValidatesCertificateChain];
@@ -217,6 +222,20 @@ char * dendriteMessageArgumentTypesTable[] = {
     [invocation retain];
     
     defaultResponses[typeID] = invocation;
+}
+
+- (BOOL)didConnectionFail
+{
+    return disconnected;
+}
+
+- (void)attemptReconnect
+{
+    if ([socket isConnected]) {
+        [socket disconnect];
+    }
+    
+    [socket connectToHost:connectingHost onPort:connectingPort error:nil];
 }
 
 #pragma mark - Encoding helper methods
@@ -288,8 +307,16 @@ char * dendriteMessageArgumentTypesTable[] = {
 
 - (void)onSocketDidSecure:(AsyncSocket *)sock
 {
+    disconnected = NO;
     if (delegate != nil && [delegate respondsToSelector:@selector(connectedWithClient:)])
         [delegate connectedWithClient:self];
+}
+
+- (void)onSocket:(AsyncSocket *)sender willDisconnectWithError:(NSError *)error
+{
+    disconnected = YES;
+    if (delegate != nil && [delegate respondsToSelector:@selector(unconnectedWithClient:)])
+        [delegate unconnectedWithClient:self];
 }
 
 - (void)onSocket:(AsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
