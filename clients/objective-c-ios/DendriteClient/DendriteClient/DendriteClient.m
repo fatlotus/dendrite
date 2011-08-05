@@ -397,7 +397,7 @@ char * dendriteMessageArgumentTypesTable[] = {
                     } else {
                         result = stringRead;
                     }
-                    [response setArgument:&stringRead atIndex:(i+3)];
+                    [response setArgument:&result atIndex:(i+3)];
                     
                     break;
                 

@@ -6,6 +6,7 @@ import re
 import json
 
 LOGIN_URL = "https://www.globusonline.org/authenticate"
+API_CALL = "https://transfer.api.globusonline.org/v0.10/%s"
 GOST_EXTRACTOR = r">GOST\.override\((.+?)\);</script>"
 SAML_EXTRACTOR = r"\Asaml=(\".+?\");"
 
@@ -24,7 +25,7 @@ def betterGetPage(url, contextFactory=None, post=None, *vargs, **dargs):
          dargs["method"] = "POST"
    
    if not "timeout" in dargs:
-      dargs["timeout"] = 15
+      dargs["timeout"] = 10
    
    if not "followRedirect" in dargs:
       dargs["followRedirect"] = 0
@@ -39,7 +40,7 @@ def betterGetPage(url, contextFactory=None, post=None, *vargs, **dargs):
    elif scheme == 'http':
       reactor.connectTCP(host, port, factory)
    else:
-      raise "Invalid URL scheme: %s" % scheme
+      raise Exception("Invalid URL scheme: %s" % scheme)
    
    return factory
 
@@ -69,9 +70,8 @@ def authenticate(username, password, info=None):
          for cookie in f.response_headers.get("set-cookie", []):
             match = re.match(SAML_EXTRACTOR, cookie)
             if match is not None:
-               return { "saml_token" : match.group(1) }
+               return { "auth_cookie" : match.group(1) }
          
-         raise failure
    
    f.deferred.addCallback(success)
    f.deferred.addErrback(failure)
@@ -79,19 +79,34 @@ def authenticate(username, password, info=None):
    return f.deferred
 
 class Request(object):
-   def __init__(self, method, url, query_string, body):
-      pass
+   def __init__(self, session, method, url, query_string, body):
+      self.session = session
+      self.method = method
+      self.url = url
+      self.query_string = query_string
+      self.body = body
+      self.cancelled = False
+      
    
-   def fetch(self, success, failure):   
-      # Invoke success(data) when the request completes successfully,
-      # and failure(err, message) when it doesn't.
-      pass
+   def fetch(self, success, failure):
+      f = betterGetPage(API_CALL % str("%s?%s" % (self.url, self.query_string)),
+         method=str(self.method),
+         postdata=str(self.body),
+         cookies={ "saml" : self.session.get("auth_cookie") })
+      f.deferred.addCallback(lambda body: success(json.loads(body)))
+      f.deferred.addErrback(lambda f: failure("RequestFailed", f.getErrorMessage()))
    
    def listen(self, update, failure):
-      # Invoke update(type, newdata) when the resource is updated,
-      # and failure(err, message) when something fails.
-      pass
+      def set_initial_content(content):
+         def differencing(body):
+            if body != content:
+               update("refresh", body)
+               set_initial_content(body)
+            elif not self.cancelled:
+               reactor.callLater(30.0, set_initial_content, content)
+         self.fetch(differencing, failure)
+      
+      self.fetch(set_initial_content, failure)
    
    def cancel(self):
-      # Cancel the listeners, if any.
-      pass
+      self.cancelled = True

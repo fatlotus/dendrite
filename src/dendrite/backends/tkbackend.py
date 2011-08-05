@@ -39,7 +39,7 @@ def authenticate(username, password, info=""):
    return d
 
 class Request(object):
-   def __init__(self, method, url, query_string, body):
+   def __init__(self, session, method, url, query_string, body):
       self.method = method
       self.url = url
       self.query_string = query_string
