@@ -86,9 +86,9 @@ class Request(object):
       self.query_string = query_string
       self.body = body
       self.cancelled = False
-      
    
    def fetch(self, success, failure):
+      print "URL: %s" % (API_CALL % str("%s?%s" % (self.url, self.query_string)))
       f = betterGetPage(API_CALL % str("%s?%s" % (self.url, self.query_string)),
          method=str(self.method),
          postdata=str(self.body),

@@ -1,4 +1,4 @@
-import tkbackend
+# import tkbackend
 import pollingbackend
 
 # Returns the preferred backend module.

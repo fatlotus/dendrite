@@ -100,6 +100,9 @@ class DendriteProtocol(protocol.Protocol):
       self.connection.send = send
       self.connection.initialize_connection()
    
+   def connectionLost(self, reason=None):
+      self.connection.terminate_connection()
+   
    def dataReceived(self, data):
       self.buffer += data
 

@@ -8,11 +8,21 @@ class ServerSideConnection():
       # self.heartbeat()
       self._backend = backends.preferred()
       self._session = None
+      self._closed = False
+      self._listeners = [ ]
+   
+   def terminate_connection(self):
+      for listener in self._listeners:
+         listener.cancel()
+      self._closed = True
    
    def is_authenticated(self):
       return (self._session != None)
    
    def heartbeat(self):
+      if self._closed:
+         return
+      
       def handle_response(reply, cancel):
          pass
       self.send("echo", echo=handle_response)
@@ -65,7 +75,9 @@ class ServerSideConnection():
    def received_listen(self, reply_to_listen, url, query_string):
       if self.is_authenticated():
          request = self._backend.Request(self._session, 'GET', url, query_string, '')
-      
+         
+         self._listeners.append(request)
+         
          def handle_cancel(reply_to_cancel, keep_waiting):
             request.cancel()
       
