@@ -5,7 +5,7 @@ import sys
 class ServerSideConnection():
    def initialize_connection(self):
       self.startTLS(is_server=True)
-      # self.heartbeat()
+      self.heartbeat()
       self._backend = backends.preferred()
       self._session = None
       self._closed = False
