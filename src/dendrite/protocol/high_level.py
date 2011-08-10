@@ -2,6 +2,15 @@ from twisted.internet import reactor # FIXME
 from dendrite import backends
 import sys
 
+def requires_authentication(method):
+   def inner(self, reply, *vargs):
+      if self.is_authenticated():
+         return method(self, reply, *vargs)
+      else:
+         reply('failure', 'AccessDenied', 'This command requires authentication.')
+   
+   return inner
+
 class ServerSideConnection():
    def initialize_connection(self):
       self.startTLS(is_server=True)
@@ -57,43 +66,39 @@ class ServerSideConnection():
       self.send("identify", identity=identify_succeeded,
          failure=identify_failed)
    
+   @requires_authentication
    def received_fetch(self, reply, method, url, query_string, body):
-      if self.is_authenticated():
-         def success(data):
-            if self.is_authenticated():
-               reply('data', data)
-         
-         def failure(failure, desc):
-            if self.is_authenticated():
-               reply('failure', failure, desc)
-         
-         self._backend.Request(self._session, method, url, query_string,
-            body).fetch(success, failure)
-      else:
-         reply("failure", "AuthRequired", "The fetch command requires authentication.")
+      def success(data):
+         if self.is_authenticated():
+            reply('data', data)
+      
+      def failure(failure, desc):
+         if self.is_authenticated():
+            reply('failure', failure, desc)
+      
+      self._backend.Request(self._session, method, url, query_string,
+         body).fetch(success, failure)
    
+   @requires_authentication
    def received_listen(self, reply_to_listen, url, query_string):
-      if self.is_authenticated():
-         request = self._backend.Request(self._session, 'GET', url, query_string, '')
-         
-         self._listeners.append(request)
-         
-         def handle_cancel(reply_to_cancel, keep_waiting):
-            request.cancel()
+      request = self._backend.Request(self._session, 'GET', url, query_string, '')
       
-         def got_new_data(*data):
-            if self.is_authenticated():
-               reply_to_listen("notify", *data, cancel=handle_cancel)
+      self._listeners.append(request)
       
-         def request_failed(*info):
-            if self.is_authenticated():
-               reply_to_listen("failure", *info)
-      
-         request.listen(got_new_data, request_failed)
-      
-         reply_to_listen("success", cancel=handle_cancel)
-      else:
-         reply_to_listen("failure", "AccessDenied", "Cannot Listen without authentication.")
+      def handle_cancel(reply_to_cancel, keep_waiting):
+         request.cancel()
+   
+      def got_new_data(*data):
+         if self.is_authenticated():
+            reply_to_listen("notify", *data, cancel=handle_cancel)
+   
+      def request_failed(*info):
+         if self.is_authenticated():
+            reply_to_listen("failure", *info)
+   
+      request.listen(got_new_data, request_failed)
+   
+      reply_to_listen("success", cancel=handle_cancel)
    
 
 class ClientSideConnection():
@@ -108,12 +113,12 @@ class ClientSideConnection():
             keep_waiting()
          
          def handle_data(reply_to_data, keep_waiting, data):
-            pass
+            self._data_called = True
          
-         self.send("fetch", "GET", "task_list", "", "",
+         self.send("fetch", "GET", "dendrite/nonce", "", "",
           success=handle_successful_listen, data=handle_data)
          
-         self.send("listen", "task_list", "",
+         self.send("listen", "dendrite/nonce", "",
           success=handle_successful_listen, notify=handle_notify)
       
       def handle_login_failed(reply, keep_waiting, error, description):
