@@ -1,0 +1,413 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7015FAEF13F314080065768A /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FAD713F314080065768A /* NSObject+SBJson.m */; };
+		7015FAF013F314080065768A /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FADA13F314080065768A /* SBJsonParser.m */; };
+		7015FAF113F314080065768A /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FADC13F314080065768A /* SBJsonStreamParser.m */; };
+		7015FAF213F314080065768A /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FADE13F314080065768A /* SBJsonStreamParserAccumulator.m */; };
+		7015FAF313F314080065768A /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FAE013F314080065768A /* SBJsonStreamParserAdapter.m */; };
+		7015FAF413F314080065768A /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FAE213F314080065768A /* SBJsonStreamParserState.m */; };
+		7015FAF513F314080065768A /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FAE413F314080065768A /* SBJsonStreamWriter.m */; };
+		7015FAF613F314080065768A /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FAE613F314080065768A /* SBJsonStreamWriterAccumulator.m */; };
+		7015FAF713F314080065768A /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FAE813F314080065768A /* SBJsonStreamWriterState.m */; };
+		7015FAF813F314080065768A /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FAEA13F314080065768A /* SBJsonTokeniser.m */; };
+		7015FAF913F314080065768A /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FAEC13F314080065768A /* SBJsonUTF8Stream.m */; };
+		7015FAFA13F314080065768A /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 7015FAEE13F314080065768A /* SBJsonWriter.m */; };
+		70CC6CBF13F2CE480033AD26 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70CC6CBE13F2CE480033AD26 /* Cocoa.framework */; };
+		70CC6CC913F2CE480033AD26 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 70CC6CC713F2CE480033AD26 /* InfoPlist.strings */; };
+		70CC6CCB13F2CE480033AD26 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 70CC6CCA13F2CE480033AD26 /* main.m */; };
+		70CC6CCF13F2CE480033AD26 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 70CC6CCD13F2CE480033AD26 /* Credits.rtf */; };
+		70CC6CD213F2CE480033AD26 /* DendriteSpeedTestAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 70CC6CD113F2CE480033AD26 /* DendriteSpeedTestAppDelegate.m */; };
+		70CC6CD513F2CE490033AD26 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 70CC6CD313F2CE490033AD26 /* MainMenu.xib */; };
+		70CC6CE113F2CF610033AD26 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 70CC6CDC13F2CF610033AD26 /* AsyncSocket.m */; };
+		70CC6CE213F2CF610033AD26 /* DendriteClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 70CC6CDE13F2CF610033AD26 /* DendriteClient.m */; };
+		70CC6CE313F2CF610033AD26 /* DendriteIncomingMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 70CC6CDF13F2CF610033AD26 /* DendriteIncomingMessage.m */; };
+		70CC6CE413F2CF610033AD26 /* DendriteOutgoingMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 70CC6CE013F2CF610033AD26 /* DendriteOutgoingMessage.m */; };
+		70CC6CE913F2CF960033AD26 /* DendriteTestRunner.m in Sources */ = {isa = PBXBuildFile; fileRef = 70CC6CE813F2CF960033AD26 /* DendriteTestRunner.m */; };
+		70CC6CEB13F2D01E0033AD26 /* OptionsSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 70CC6CEA13F2D01E0033AD26 /* OptionsSheet.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		7015FAD513F314080065768A /* JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSON.h; sourceTree = "<group>"; };
+		7015FAD613F314080065768A /* NSObject+SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SBJson.h"; sourceTree = "<group>"; };
+		7015FAD713F314080065768A /* NSObject+SBJson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SBJson.m"; sourceTree = "<group>"; };
+		7015FAD813F314080065768A /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJson.h; sourceTree = "<group>"; };
+		7015FAD913F314080065768A /* SBJsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonParser.h; sourceTree = "<group>"; };
+		7015FADA13F314080065768A /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonParser.m; sourceTree = "<group>"; };
+		7015FADB13F314080065768A /* SBJsonStreamParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamParser.h; sourceTree = "<group>"; };
+		7015FADC13F314080065768A /* SBJsonStreamParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamParser.m; sourceTree = "<group>"; };
+		7015FADD13F314080065768A /* SBJsonStreamParserAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamParserAccumulator.h; sourceTree = "<group>"; };
+		7015FADE13F314080065768A /* SBJsonStreamParserAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamParserAccumulator.m; sourceTree = "<group>"; };
+		7015FADF13F314080065768A /* SBJsonStreamParserAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamParserAdapter.h; sourceTree = "<group>"; };
+		7015FAE013F314080065768A /* SBJsonStreamParserAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamParserAdapter.m; sourceTree = "<group>"; };
+		7015FAE113F314080065768A /* SBJsonStreamParserState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamParserState.h; sourceTree = "<group>"; };
+		7015FAE213F314080065768A /* SBJsonStreamParserState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamParserState.m; sourceTree = "<group>"; };
+		7015FAE313F314080065768A /* SBJsonStreamWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamWriter.h; sourceTree = "<group>"; };
+		7015FAE413F314080065768A /* SBJsonStreamWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamWriter.m; sourceTree = "<group>"; };
+		7015FAE513F314080065768A /* SBJsonStreamWriterAccumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamWriterAccumulator.h; sourceTree = "<group>"; };
+		7015FAE613F314080065768A /* SBJsonStreamWriterAccumulator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamWriterAccumulator.m; sourceTree = "<group>"; };
+		7015FAE713F314080065768A /* SBJsonStreamWriterState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonStreamWriterState.h; sourceTree = "<group>"; };
+		7015FAE813F314080065768A /* SBJsonStreamWriterState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonStreamWriterState.m; sourceTree = "<group>"; };
+		7015FAE913F314080065768A /* SBJsonTokeniser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonTokeniser.h; sourceTree = "<group>"; };
+		7015FAEA13F314080065768A /* SBJsonTokeniser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonTokeniser.m; sourceTree = "<group>"; };
+		7015FAEB13F314080065768A /* SBJsonUTF8Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonUTF8Stream.h; sourceTree = "<group>"; };
+		7015FAEC13F314080065768A /* SBJsonUTF8Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonUTF8Stream.m; sourceTree = "<group>"; };
+		7015FAED13F314080065768A /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonWriter.h; sourceTree = "<group>"; };
+		7015FAEE13F314080065768A /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonWriter.m; sourceTree = "<group>"; };
+		70CC6CBA13F2CE480033AD26 /* DendriteSpeedTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DendriteSpeedTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		70CC6CBE13F2CE480033AD26 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		70CC6CC113F2CE480033AD26 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		70CC6CC213F2CE480033AD26 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		70CC6CC313F2CE480033AD26 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		70CC6CC613F2CE480033AD26 /* DendriteSpeedTest-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DendriteSpeedTest-Info.plist"; sourceTree = "<group>"; };
+		70CC6CC813F2CE480033AD26 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		70CC6CCA13F2CE480033AD26 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		70CC6CCC13F2CE480033AD26 /* DendriteSpeedTest-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DendriteSpeedTest-Prefix.pch"; sourceTree = "<group>"; };
+		70CC6CCE13F2CE480033AD26 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		70CC6CD013F2CE480033AD26 /* DendriteSpeedTestAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DendriteSpeedTestAppDelegate.h; sourceTree = "<group>"; };
+		70CC6CD113F2CE480033AD26 /* DendriteSpeedTestAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DendriteSpeedTestAppDelegate.m; sourceTree = "<group>"; };
+		70CC6CD413F2CE490033AD26 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		70CC6CDB13F2CF600033AD26 /* AsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncSocket.h; sourceTree = "<group>"; };
+		70CC6CDC13F2CF610033AD26 /* AsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncSocket.m; sourceTree = "<group>"; };
+		70CC6CDD13F2CF610033AD26 /* DendriteClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DendriteClient.h; sourceTree = "<group>"; };
+		70CC6CDE13F2CF610033AD26 /* DendriteClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DendriteClient.m; sourceTree = "<group>"; };
+		70CC6CDF13F2CF610033AD26 /* DendriteIncomingMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DendriteIncomingMessage.m; sourceTree = "<group>"; };
+		70CC6CE013F2CF610033AD26 /* DendriteOutgoingMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DendriteOutgoingMessage.m; sourceTree = "<group>"; };
+		70CC6CE713F2CF960033AD26 /* DendriteTestRunner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DendriteTestRunner.h; sourceTree = "<group>"; };
+		70CC6CE813F2CF960033AD26 /* DendriteTestRunner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DendriteTestRunner.m; sourceTree = "<group>"; };
+		70CC6CEA13F2D01E0033AD26 /* OptionsSheet.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OptionsSheet.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		70CC6CB713F2CE480033AD26 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70CC6CBF13F2CE480033AD26 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7015FAD313F313F10065768A /* JSON */ = {
+			isa = PBXGroup;
+			children = (
+				7015FAD513F314080065768A /* JSON.h */,
+				7015FAD613F314080065768A /* NSObject+SBJson.h */,
+				7015FAD713F314080065768A /* NSObject+SBJson.m */,
+				7015FAD813F314080065768A /* SBJson.h */,
+				7015FAD913F314080065768A /* SBJsonParser.h */,
+				7015FADA13F314080065768A /* SBJsonParser.m */,
+				7015FADB13F314080065768A /* SBJsonStreamParser.h */,
+				7015FADC13F314080065768A /* SBJsonStreamParser.m */,
+				7015FADD13F314080065768A /* SBJsonStreamParserAccumulator.h */,
+				7015FADE13F314080065768A /* SBJsonStreamParserAccumulator.m */,
+				7015FADF13F314080065768A /* SBJsonStreamParserAdapter.h */,
+				7015FAE013F314080065768A /* SBJsonStreamParserAdapter.m */,
+				7015FAE113F314080065768A /* SBJsonStreamParserState.h */,
+				7015FAE213F314080065768A /* SBJsonStreamParserState.m */,
+				7015FAE313F314080065768A /* SBJsonStreamWriter.h */,
+				7015FAE413F314080065768A /* SBJsonStreamWriter.m */,
+				7015FAE513F314080065768A /* SBJsonStreamWriterAccumulator.h */,
+				7015FAE613F314080065768A /* SBJsonStreamWriterAccumulator.m */,
+				7015FAE713F314080065768A /* SBJsonStreamWriterState.h */,
+				7015FAE813F314080065768A /* SBJsonStreamWriterState.m */,
+				7015FAE913F314080065768A /* SBJsonTokeniser.h */,
+				7015FAEA13F314080065768A /* SBJsonTokeniser.m */,
+				7015FAEB13F314080065768A /* SBJsonUTF8Stream.h */,
+				7015FAEC13F314080065768A /* SBJsonUTF8Stream.m */,
+				7015FAED13F314080065768A /* SBJsonWriter.h */,
+				7015FAEE13F314080065768A /* SBJsonWriter.m */,
+			);
+			name = JSON;
+			sourceTree = "<group>";
+		};
+		70CC6CAF13F2CE480033AD26 = {
+			isa = PBXGroup;
+			children = (
+				70CC6CC413F2CE480033AD26 /* DendriteSpeedTest */,
+				70CC6CBD13F2CE480033AD26 /* Frameworks */,
+				70CC6CBB13F2CE480033AD26 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		70CC6CBB13F2CE480033AD26 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				70CC6CBA13F2CE480033AD26 /* DendriteSpeedTest.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		70CC6CBD13F2CE480033AD26 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				70CC6CBE13F2CE480033AD26 /* Cocoa.framework */,
+				70CC6CC013F2CE480033AD26 /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		70CC6CC013F2CE480033AD26 /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				70CC6CC113F2CE480033AD26 /* AppKit.framework */,
+				70CC6CC213F2CE480033AD26 /* CoreData.framework */,
+				70CC6CC313F2CE480033AD26 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		70CC6CC413F2CE480033AD26 /* DendriteSpeedTest */ = {
+			isa = PBXGroup;
+			children = (
+				7015FAD313F313F10065768A /* JSON */,
+				70CC6CE513F2CF640033AD26 /* DendriteClient */,
+				70CC6CD013F2CE480033AD26 /* DendriteSpeedTestAppDelegate.h */,
+				70CC6CD113F2CE480033AD26 /* DendriteSpeedTestAppDelegate.m */,
+				70CC6CE713F2CF960033AD26 /* DendriteTestRunner.h */,
+				70CC6CE813F2CF960033AD26 /* DendriteTestRunner.m */,
+				70CC6CD313F2CE490033AD26 /* MainMenu.xib */,
+				70CC6CEA13F2D01E0033AD26 /* OptionsSheet.xib */,
+				70CC6CC513F2CE480033AD26 /* Supporting Files */,
+			);
+			path = DendriteSpeedTest;
+			sourceTree = "<group>";
+		};
+		70CC6CC513F2CE480033AD26 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				70CC6CC613F2CE480033AD26 /* DendriteSpeedTest-Info.plist */,
+				70CC6CC713F2CE480033AD26 /* InfoPlist.strings */,
+				70CC6CCA13F2CE480033AD26 /* main.m */,
+				70CC6CCC13F2CE480033AD26 /* DendriteSpeedTest-Prefix.pch */,
+				70CC6CCD13F2CE480033AD26 /* Credits.rtf */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		70CC6CE513F2CF640033AD26 /* DendriteClient */ = {
+			isa = PBXGroup;
+			children = (
+				70CC6CDB13F2CF600033AD26 /* AsyncSocket.h */,
+				70CC6CDC13F2CF610033AD26 /* AsyncSocket.m */,
+				70CC6CDD13F2CF610033AD26 /* DendriteClient.h */,
+				70CC6CDE13F2CF610033AD26 /* DendriteClient.m */,
+				70CC6CDF13F2CF610033AD26 /* DendriteIncomingMessage.m */,
+				70CC6CE013F2CF610033AD26 /* DendriteOutgoingMessage.m */,
+			);
+			name = DendriteClient;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		70CC6CB913F2CE480033AD26 /* DendriteSpeedTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 70CC6CD813F2CE490033AD26 /* Build configuration list for PBXNativeTarget "DendriteSpeedTest" */;
+			buildPhases = (
+				70CC6CB613F2CE480033AD26 /* Sources */,
+				70CC6CB713F2CE480033AD26 /* Frameworks */,
+				70CC6CB813F2CE480033AD26 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DendriteSpeedTest;
+			productName = DendriteSpeedTest;
+			productReference = 70CC6CBA13F2CE480033AD26 /* DendriteSpeedTest.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		70CC6CB113F2CE480033AD26 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 70CC6CB413F2CE480033AD26 /* Build configuration list for PBXProject "DendriteSpeedTest" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 70CC6CAF13F2CE480033AD26;
+			productRefGroup = 70CC6CBB13F2CE480033AD26 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				70CC6CB913F2CE480033AD26 /* DendriteSpeedTest */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		70CC6CB813F2CE480033AD26 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70CC6CC913F2CE480033AD26 /* InfoPlist.strings in Resources */,
+				70CC6CCF13F2CE480033AD26 /* Credits.rtf in Resources */,
+				70CC6CD513F2CE490033AD26 /* MainMenu.xib in Resources */,
+				70CC6CEB13F2D01E0033AD26 /* OptionsSheet.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		70CC6CB613F2CE480033AD26 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				70CC6CCB13F2CE480033AD26 /* main.m in Sources */,
+				70CC6CD213F2CE480033AD26 /* DendriteSpeedTestAppDelegate.m in Sources */,
+				70CC6CE113F2CF610033AD26 /* AsyncSocket.m in Sources */,
+				70CC6CE213F2CF610033AD26 /* DendriteClient.m in Sources */,
+				70CC6CE313F2CF610033AD26 /* DendriteIncomingMessage.m in Sources */,
+				70CC6CE413F2CF610033AD26 /* DendriteOutgoingMessage.m in Sources */,
+				70CC6CE913F2CF960033AD26 /* DendriteTestRunner.m in Sources */,
+				7015FAEF13F314080065768A /* NSObject+SBJson.m in Sources */,
+				7015FAF013F314080065768A /* SBJsonParser.m in Sources */,
+				7015FAF113F314080065768A /* SBJsonStreamParser.m in Sources */,
+				7015FAF213F314080065768A /* SBJsonStreamParserAccumulator.m in Sources */,
+				7015FAF313F314080065768A /* SBJsonStreamParserAdapter.m in Sources */,
+				7015FAF413F314080065768A /* SBJsonStreamParserState.m in Sources */,
+				7015FAF513F314080065768A /* SBJsonStreamWriter.m in Sources */,
+				7015FAF613F314080065768A /* SBJsonStreamWriterAccumulator.m in Sources */,
+				7015FAF713F314080065768A /* SBJsonStreamWriterState.m in Sources */,
+				7015FAF813F314080065768A /* SBJsonTokeniser.m in Sources */,
+				7015FAF913F314080065768A /* SBJsonUTF8Stream.m in Sources */,
+				7015FAFA13F314080065768A /* SBJsonWriter.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		70CC6CC713F2CE480033AD26 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				70CC6CC813F2CE480033AD26 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		70CC6CCD13F2CE480033AD26 /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				70CC6CCE13F2CE480033AD26 /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		70CC6CD313F2CE490033AD26 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				70CC6CD413F2CE490033AD26 /* en */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		70CC6CD613F2CE490033AD26 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		70CC6CD713F2CE490033AD26 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		70CC6CD913F2CE490033AD26 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "DendriteSpeedTest/DendriteSpeedTest-Prefix.pch";
+				INFOPLIST_FILE = "DendriteSpeedTest/DendriteSpeedTest-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		70CC6CDA13F2CE490033AD26 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "DendriteSpeedTest/DendriteSpeedTest-Prefix.pch";
+				INFOPLIST_FILE = "DendriteSpeedTest/DendriteSpeedTest-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		70CC6CB413F2CE480033AD26 /* Build configuration list for PBXProject "DendriteSpeedTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				70CC6CD613F2CE490033AD26 /* Debug */,
+				70CC6CD713F2CE490033AD26 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		70CC6CD813F2CE490033AD26 /* Build configuration list for PBXNativeTarget "DendriteSpeedTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				70CC6CD913F2CE490033AD26 /* Debug */,
+				70CC6CDA13F2CE490033AD26 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 70CC6CB113F2CE480033AD26 /* Project object */;
+}

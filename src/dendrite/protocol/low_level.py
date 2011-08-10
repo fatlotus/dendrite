@@ -75,7 +75,7 @@ class DendriteProtocol(protocol.Protocol):
       header = struct.pack(PACKET_HEADER, reply, types.TYPE_IDS[kind], len(message))
       
       if self.is_server_side:
-         print "C<-S %s" % repr(dict(id=self.sent_message_id, reply=reply, kind=kind, body=message))
+         pass # print "C<-S %s" % repr(dict(id=self.sent_message_id, reply=reply, kind=kind, body=message))
       
       self.transport.write(header)
       self.transport.write(message)
@@ -120,7 +120,7 @@ class DendriteProtocol(protocol.Protocol):
          if self.length >= 0:
             if len(self.buffer) >= self.length:
                if self.is_server_side:
-                  print "C->S %s" % repr(dict(id=self.received_message_id, reply=self.reply, kind=types.INVERTED_TYPE_IDS[self.kind], body=self.buffer[:self.length]))
+                  pass # print "C->S %s" % repr(dict(id=self.received_message_id, reply=self.reply, kind=types.INVERTED_TYPE_IDS[self.kind], body=self.buffer[:self.length]))
                self.packetReceived(self.buffer[:self.length])
                self.buffer = self.buffer[self.length:]
                self.length = -1
