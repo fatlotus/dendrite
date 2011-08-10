@@ -341,6 +341,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "Dendrite Speed Test";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -360,6 +361,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_NAME = "Dendrite Speed Test";
 				SDKROOT = macosx;
 			};
 			name = Release;
