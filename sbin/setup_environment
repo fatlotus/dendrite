@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo Setting up an environment for Dendrite...
+
+if [ `uname -s` = "Linux" ];
+ then
+   sudo apt-get -y -qq install python-twisted git-core &&
+   echo Running Dendrite tests... &&
+   cd /vagrant/ &&
+   sbin/test_runner &&
+   echo Testing complete.
+else
+   echo Only Linux is supported at this time.
+fi
