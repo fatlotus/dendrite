@@ -1,5 +1,5 @@
 Vagrant::Config.run do |config|
-  config.vm.box = "lucid32"
+  config.vm.box = "base"
   
   config.vm.provision :shell, :path => 'sbin/setup_environment'
   
