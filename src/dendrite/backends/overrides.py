@@ -94,7 +94,7 @@ def fetch_api(request):
          urllib.quote(api_path), request_dict["query_string"]))
    
       # sending the actual request.
-      # print "## %s" % url
+      print "## %s" % url
       f = http_helper.fetch(url,
          method=str(request_dict["method"]),
          postdata=str(request_dict["body"]),
