@@ -263,15 +263,15 @@ char * dendriteMessageArgumentTypesTable[] = {
         
         if (type == 's' && [object isKindOfClass:[NSString class]]) {
             NSData * encodedAsUTF8 = [(NSString*)object dataUsingEncoding:NSUTF8StringEncoding];
-            uint16_t length = htons((uint16_t)[encodedAsUTF8 length]);
+            uint32_t length = htonl((uint32_t)[encodedAsUTF8 length]);
             
-            [fields appendBytes:&length length:sizeof(uint16_t)];
+            [fields appendBytes:&length length:sizeof(uint32_t)];
             [fields appendData:encodedAsUTF8];
         } else if (type == 'd') {
             NSData * encodedAsUTF8 = [[object JSONRepresentation] dataUsingEncoding:NSUTF8StringEncoding];
-            uint16_t length = htons((uint16_t)[encodedAsUTF8 length]);
+            uint32_t length = htonl((uint32_t)[encodedAsUTF8 length]);
             
-            [fields appendBytes:&length length:sizeof(uint16_t)];
+            [fields appendBytes:&length length:sizeof(uint32_t)];
             [fields appendData:encodedAsUTF8];
         } else if (type == 'u' && [object isKindOfClass:[NSNumber class]]) {
             uint32_t data = htonl([object unsignedIntValue]);
@@ -385,12 +385,12 @@ char * dendriteMessageArgumentTypesTable[] = {
                 case 's':
                 case 'd':
                     
-                    [data getBytes:&int16 range:NSMakeRange(o,2)];
-                    int16 = ntohs(int16);
+                    [data getBytes:&int32 range:NSMakeRange(o,4)];
+                    int32 = ntohl(int32);
                     
-                    o += 2;
-                    stringRead = [[NSString alloc] initWithData:[data subdataWithRange:NSMakeRange(o, int16)] encoding:NSUTF8StringEncoding];
-                    o += int16;
+                    o += 4;
+                    stringRead = [[NSString alloc] initWithData:[data subdataWithRange:NSMakeRange(o, int32)] encoding:NSUTF8StringEncoding];
+                    o += int32;
                     
                     if (fieldTypes[i] == 'd') {
                         result = [stringRead JSONValue];
