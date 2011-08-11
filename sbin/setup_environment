@@ -4,7 +4,7 @@ echo Setting up an environment for Dendrite...
 
 if [ `uname -s` = "Linux" ];
  then
-   sudo apt-get -y -qq install python-twisted git-core &&
+   sudo apt-get -y -qq install python-twisted python-webut git-core &&
    echo Running Dendrite tests... &&
    cd /vagrant/ &&
    sbin/test_runner &&
