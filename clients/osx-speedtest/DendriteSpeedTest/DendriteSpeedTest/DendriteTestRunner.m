@@ -60,7 +60,7 @@
     [dendriteClientList addObject: client];
     
     if ([dendriteClientList count] < numberOfClients) {
-        [self performSelector:@selector(addNextClient) withObject:nil afterDelay:0.1];
+        [self performSelector:@selector(addNextClient) withObject:nil afterDelay:0.01];
     }
 }
 
