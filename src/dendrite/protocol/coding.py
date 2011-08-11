@@ -23,7 +23,7 @@ def encode(types, values):
                value = json.dumps(value).encode('utf-8')
             if kind is unicode:
                value = value.encode('utf-8')
-            fragments.extend(struct.pack('!H', len(value)))
+            fragments.extend(struct.pack('!I', len(value)))
             fragments.append(value)
          elif kind is int:
             fragments.extend(struct.pack('!i', value))
@@ -46,8 +46,8 @@ def decode(message, kinds):
    
    for kind in kinds:
       if kind in (str, unicode, dict):
-         length = struct.unpack_from('!H', message, offset)[0]
-         offset += struct.calcsize('H')
+         length = struct.unpack_from('!I', message, offset)[0]
+         offset += struct.calcsize('I')
          read = message[offset:offset+length].decode('utf-8')
          offset += length
          
