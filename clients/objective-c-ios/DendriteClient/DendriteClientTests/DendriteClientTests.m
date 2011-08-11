@@ -18,7 +18,7 @@
     [super setUp];
     
     testHelper = [[BlockingTestHelper alloc] init];
-    client = [[DendriteClient alloc] initWithAddress:@"localhost" port:8080 andDelegate:self];
+    client = [[DendriteClient alloc] initWithAddress:@"localhost" port:1337 andDelegate:self];
 }
 
 - (void)tearDown
