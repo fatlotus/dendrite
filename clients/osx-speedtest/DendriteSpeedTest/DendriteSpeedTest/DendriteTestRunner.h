@@ -11,6 +11,10 @@
 
 #define kTestTypeConcurrency 1
 #define kTestTypeLoad 2
+#define kTestUsername @"fatlotus"
+#define kTestPassword @"test"
+#define kTestListenURL @"dendrite/nonce"
+#define kLoadTestDelay 0.1
 
 @interface DendriteTestRunner : NSObject <DendriteClientDelegate> {
     IBOutlet NSWindow * mainWindow;

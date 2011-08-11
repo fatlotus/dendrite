@@ -60,7 +60,7 @@
     [dendriteClientList addObject: client];
     
     if ([dendriteClientList count] < numberOfClients) {
-        [self performSelector:@selector(addNextClient) withObject:nil afterDelay:0.01];
+        [self performSelector:@selector(addNextClient) withObject:nil afterDelay:kLoadTestDelay];
     }
 }
 
@@ -120,7 +120,7 @@
         
         for (DendriteClient * client in dendriteClientList) {
             DendriteOutgoingMessage * outgoing;
-            outgoing = [client sendMessage:TypeListen withArguments:@"local/", @""];
+            outgoing = [client sendMessage:TypeListen withArguments:kTestListenURL, @""];
             [outgoing respondToReply:TypeSuccess withSelector:@selector(handleListenSuccess:)];
             [outgoing respondToReply:TypeNotify withSelector:@selector(handleListenNotify:type:data:)];
             [outgoing respondToReply:TypeFailure withSelector:@selector(handleListenFailure:failure:description:)];
@@ -234,7 +234,7 @@
     DendriteOutgoingMessage * outgoingMessage;
     
     outgoingMessage = [client sendMessage:TypeLogin
-                            withArguments:@"fatlotus", @"test"];
+                            withArguments:kTestUsername, kTestPassword];
     
     [outgoingMessage setUserInfo:[NSDate date]];
     
@@ -247,7 +247,7 @@
     }
 }
 
-- (void)unconnectedWithClient:(DendriteClient *)client
+- (void)unconnectedWithClient:(DendriteClient *)client withError:(NSError *)error
 {
     if (runningFirstTest) {
         [self endSpeedTest];
@@ -255,7 +255,7 @@
         [progressIndicator stopAnimation:self];
         [errorMessageLabel setStringValue:@"Connect failed."];
     } else {
-        NSLog(@"Unconnected with client: %@", client);
+        [self write:[NSString stringWithFormat:@"Client disconnected: %@", error]];
     }
 }
 
