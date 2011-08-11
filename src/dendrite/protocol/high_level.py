@@ -12,6 +12,9 @@ def requires_authentication(method):
    return inner
 
 class ServerSideConnection():
+   def __init__(self):
+      self._closed = True
+   
    def initialize_connection(self):
       self.startTLS(is_server=True)
       self.heartbeat()
@@ -21,9 +24,10 @@ class ServerSideConnection():
       self._listeners = [ ]
    
    def terminate_connection(self):
-      for listener in self._listeners:
-         listener.cancel()
-      self._closed = True
+      if not(self._closed):
+         for listener in self._listeners:
+            listener.cancel()
+         self._closed = True
    
    def is_authenticated(self):
       return (self._session != None)
