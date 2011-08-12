@@ -1,0 +1,38 @@
+# dendrite.yaml
+# 
+# Main Dendrite configuration file
+---
+# # 
+# # The TCP/IP port to listen on (default: 1337).
+# # 
+# # As with anything on UNIX, you need to enable the "user"
+# # property to use a port below 1024.
+# #
+listen_port: 1337
+
+# # The setuid() user to run as (either a UID or a name).
+# # 
+# # This property is required if you are running Dendrite as root.
+# # 
+user: jarcher
+
+# # The setgrp() group to run as (either a GID or a name).
+# # 
+# group: groupname
+
+# # The number of sockets that can be accepted at a given time
+# # (default 1024). Note that this is only the connection acceptor
+# # queue size, _not_ the overall number of simultaneous connections.
+accept_backlog: 1024
+
+# # The soft limit on the number of open file descriptors.
+# # 
+# # This should be about twice the number of maximum connections,
+# # depending on average polling load.
+file_descriptor_limit: 1024
+
+# # Log all packets sent and received from this server.
+# # 
+# # This shows _all_ the information from the protocol, including
+# # computed packet IDs.
+# log_packets: false 
