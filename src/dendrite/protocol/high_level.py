@@ -60,6 +60,8 @@ class ServerSideConnection():
                self._session = result
          
          def login_failed(err):
+            logging.warn("Login failure for account %s" % repr(username))
+         
             reply_to_login("failure", "LoginFailed", err.getErrorMessage())
             self._session = None
          
@@ -72,6 +74,7 @@ class ServerSideConnection():
          try_authenticate(userAgent)
       
       def identify_failed(reply, cancel, err):
+         logging.warn("Failed to identify client.")
          try_authenticate("(unknown)")
       
       try_authenticate("none")
