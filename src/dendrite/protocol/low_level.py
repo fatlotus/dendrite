@@ -28,31 +28,39 @@ class DendriteProtocol(protocol.Protocol):
       self.log = logging.getLogger("dendrite_protocol")
       self.log.addFilter(Filter())
    
+   def handleException(self, exc):
+      self.log.exception(esc)
+      self.sendMessage("failure", "Error", "An error occurred.")
+      self.tranport.close()
+   
    def packetReceived(self, message):
-      type_name = types.INVERTED_TYPE_IDS[self.kind]
-      message_id = self.received_message_id
-      fields = coding.decode(message, types.FIELD_TYPES[type_name])
-      reply_id = self.reply
+      try:
+         type_name = types.INVERTED_TYPE_IDS[self.kind]
+         message_id = self.received_message_id
+         fields = coding.decode(message, types.FIELD_TYPES[type_name])
+         reply_id = self.reply
       
-      def reply(kind, *vargs, **dargs):
-         self.sendPacket(kind, reply=message_id, *vargs, **dargs)
+         def reply(kind, *vargs, **dargs):
+            self.sendPacket(kind, reply=message_id, *vargs, **dargs)
       
-      if reply_id != self.received_message_id:
-         try:
-            method = self.replies[reply_id]
-            del self.replies[reply_id]
+         if reply_id != self.received_message_id:
+            try:
+               method = self.replies[reply_id]
+               del self.replies[reply_id]
             
-            def keep_waiting():
-               self.replies[reply_id] = method
+               def keep_waiting():
+                  self.replies[reply_id] = method
             
-            method(type_name, reply, keep_waiting, *fields)
-         except KeyError:
-            raise ValueError("%s received a reply to a message not "
-             "waited for: %i" % ("Server" if self.is_server_side else "Client",
-              reply_id))
-      else:
-         method = getattr(self.connection, "received_%s" % type_name)
-         method(reply, *fields)
+               method(type_name, reply, keep_waiting, *fields)
+            except KeyError:
+               raise ValueError("%s received a reply to a message not "
+                "waited for: %i" % ("Server" if self.is_server_side else "Client",
+                 reply_id))
+         else:
+            method = getattr(self.connection, "received_%s" % type_name)
+            method(reply, *fields)
+      except Exception, e:
+         self.handleException(e)
    
    def sendPacket(self, kind, *fields, **dargs):
       reply = None
@@ -127,34 +135,37 @@ class DendriteProtocol(protocol.Protocol):
       self.connection.terminate_connection()
    
    def dataReceived(self, data):
-      self.buffer += data
+      try:
+         self.buffer += data
 
-      while True:
-         if self.length < 0:
-            l = struct.calcsize(PACKET_HEADER)
+         while True:
+            if self.length < 0:
+               l = struct.calcsize(PACKET_HEADER)
 
-            if len(self.buffer) >= l:
-               d = struct.unpack(PACKET_HEADER, self.buffer[:l])
-               (self.reply, self.kind, self.length) = d
-               self.buffer = self.buffer[l:]
-            else:
-               break
+               if len(self.buffer) >= l:
+                  d = struct.unpack(PACKET_HEADER, self.buffer[:l])
+                  (self.reply, self.kind, self.length) = d
+                  self.buffer = self.buffer[l:]
+               else:
+                  break
 
-         if self.length >= 0:
-            if len(self.buffer) >= self.length:
-               if self.is_logging:
-                  print "C->S %s" % repr (dict (
-                     id = self.received_message_id,
-                     reply = self.reply,
-                     kind = types.INVERTED_TYPE_IDS[self.kind],
-                     body = self.buffer[:self.length]
-                  ))
-               self.packetReceived(self.buffer[:self.length])
-               self.buffer = self.buffer[self.length:]
-               self.length = -1
-               self.received_message_id += 2
-            else:
-               break
+            if self.length >= 0:
+               if len(self.buffer) >= self.length:
+                  if self.is_logging:
+                     print "C->S %s" % repr (dict (
+                        id = self.received_message_id,
+                        reply = self.reply,
+                        kind = types.INVERTED_TYPE_IDS[self.kind],
+                        body = self.buffer[:self.length]
+                     ))
+                  self.packetReceived(self.buffer[:self.length])
+                  self.buffer = self.buffer[self.length:]
+                  self.length = -1
+                  self.received_message_id += 2
+               else:
+                  break
+      except Exception, e:
+         self.handleException(e)
 
 
 class DendriteServerProtocol(DendriteProtocol):
