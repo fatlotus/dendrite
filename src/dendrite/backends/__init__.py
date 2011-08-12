@@ -2,5 +2,5 @@
 import pollingbackend
 
 # Returns the preferred backend module.
-def preferred():
+def preferred(configuration):
    return pollingbackend

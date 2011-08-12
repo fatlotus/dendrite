@@ -6,10 +6,14 @@ class DendriteServerFactory(protocol.ServerFactory):
    connection = high_level.ServerSideConnection
    protocol = low_level.DendriteServerProtocol
    
+   def __init__(self, configuration):
+      self.configuration = configuration
+   
    def buildProtocol(self, *address):
-      protocol = self.protocol()
+      protocol = self.protocol(
+         is_logging_all_packets=self.configuration.get('log_packets', False))
       protocol.factory = self
-      protocol.connection = self.connection()
+      protocol.connection = self.connection(protocol.log, self.configuration)
       protocol.connection.protocol = protocol
       return protocol
 
@@ -17,9 +21,12 @@ class DendriteClientFactory(protocol.ClientFactory):
    connection = high_level.ClientSideConnection
    protocol = low_level.DendriteClientProtocol
    
+   def __init__(self, configuration):
+      self.configuration = configuration
+   
    def buildProtocol(self, *address):
-      protocol = self.protocol()
+      protocol = self.protocol(is_logging_all_packets=False)
       protocol.factory = self
-      protocol.connection = self.connection()
+      protocol.connection = self.connection(protocol.log, self.configuration)
       protocol.connection.protocol = protocol
       return protocol

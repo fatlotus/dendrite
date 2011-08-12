@@ -1,12 +1,11 @@
-import dendrite
-import resource
-from twisted.internet import reactor
+import dendrite.runner
+import yaml
+import sys
 
-(soft, hard) = resource.getrlimit(resource.RLIMIT_NOFILE)
-# print "(soft=%i, hard=%i)" % (soft, hard)
-# resource.setrlimit(resource.RLIMIT_NOFILE, (10000, hard))
+def main():
+   configuration = yaml.load(open('config/dendrite.yaml'))
+   
+   return dendrite.runner.start_server(configuration)
 
-reactor.listenTCP(1337, dendrite.protocol.ServerFactory(), backlog=1024)
-# reactor.callLater(0.5, reactor.connectTCP, "0.0.0.0", 1337, dendrite.protocol.ClientFactory())
-
-reactor.run()
+if __name__ == "__main__":
+   sys.exit(main())

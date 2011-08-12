@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/runpy.py", line 162, in _run_module_as_main
+    "__main__", fname, loader, pkg_name)
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/runpy.py", line 72, in _run_code
+    exec code in run_globals
+  File "/Users/jarcher/Documents/2011/07-July/Dendrite/src/dendrite/__main__.py", line 11, in <module>
+    sys.exit(main())
+  File "/Users/jarcher/Documents/2011/07-July/Dendrite/src/dendrite/__main__.py", line 8, in main
+    return dendrite.runner.start_server(configuration)
+  File "/Users/jarcher/Documents/2011/07-July/Dendrite/src/dendrite/runner.py", line 26, in start_server
+    filename="log/errors.log", level=logging.INFO)
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/logging/__init__.py", line 1511, in basicConfig
+    hdlr = FileHandler(filename, mode)
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/logging/__init__.py", line 893, in __init__
+    StreamHandler.__init__(self, self._open())
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/logging/__init__.py", line 912, in _open
+    stream = open(self.baseFilename, self.mode)
+IOError: [Errno 13] Permission denied: '/Users/jarcher/Documents/2011/07-July/Dendrite/log/errors.log'

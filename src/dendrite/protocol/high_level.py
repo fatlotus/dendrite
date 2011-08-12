@@ -1,33 +1,37 @@
 from twisted.internet import reactor # FIXME
 from dendrite import backends
 import sys
+import logging
 
 def requires_authentication(method):
    def inner(self, reply, *vargs):
       if self.is_authenticated():
          return method(self, reply, *vargs)
       else:
+         self._log.warning("User attempted")
          reply('failure', 'AccessDenied', 'This command requires authentication.')
    
    return inner
 
 class ServerSideConnection():
-   def __init__(self):
+   def __init__(self, logger, configuration):
       self._closed = True
+      self._configuration = configuration
+      self._backend = backends.preferred(configuration)
+      self._session = None
+      self._closed = False
+      self._listeners = [ ]
+      self._log = logger
+      self._heartbeat_delay = configuration.get("heartbeat_delay", None)
    
    def initialize_connection(self):
       self.startTLS(is_server=True)
       self.heartbeat()
-      self._backend = backends.preferred()
-      self._session = None
-      self._closed = False
-      self._listeners = [ ]
    
    def terminate_connection(self):
-      if not(self._closed):
-         for listener in self._listeners:
-            listener.cancel()
-         self._closed = True
+      for listener in self._listeners:
+         listener.cancel()
+      self._closed = True
    
    def is_authenticated(self):
       return (self._session != None)
@@ -36,11 +40,14 @@ class ServerSideConnection():
       if self._closed:
          return
       
-      def handle_response(reply, cancel):
-         pass
-      self.send("echo", echo=handle_response)
+      heartbeat_delay = self._configuration.get("heartbeat_every", None)
       
-      reactor.callLater(30, self.heartbeat)
+      if heartbeat_delay:
+         def handle_response(reply, cancel):
+            pass
+         self.send("echo", echo=handle_response)
+      
+         reactor.callLater(heartbeat_delay, self.heartbeat)
    
    def received_session(self, reply_to_session):
       reply_to_session("data", self._session)
@@ -61,6 +68,7 @@ class ServerSideConnection():
          d.addErrback(login_failed)
       
       def identify_succeeded(reply, cancel, userAgent, deviceID):
+         logging.info("Client: %s" % userAgent)
          try_authenticate(userAgent)
       
       def identify_failed(reply, cancel, err):

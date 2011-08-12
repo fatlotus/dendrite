@@ -7,8 +7,7 @@ import time
 
 APIs = {
    "transfer" : "https://transfer.api.globusonline.org/v0.10/%s",
-   "dendrite" : None,
-   "local" : "http://localhost/%s",
+   "dendrite" : None # calls custom_api below.
 }
 
 def custom_api(request):
@@ -94,7 +93,6 @@ def fetch_api(request):
          urllib.quote(api_path), request_dict["query_string"]))
    
       # sending the actual request.
-      print "## %s" % url
       f = http_helper.fetch(url,
          method=str(request_dict["method"]),
          postdata=str(request_dict["body"]),

@@ -3,11 +3,12 @@ from twisted.internet import protocol, ssl, defer
 from dendrite.protocol import coding
 from dendrite.protocol import types
 import struct
+import logging
 
 PACKET_HEADER = "!IBI"
 
 class DendriteProtocol(protocol.Protocol):
-   def __init__(self):
+   def __init__(self, is_logging_all_packets=False):
       self.buffer = ""
       self.length = -1
       self.received_message_id = 1 if self.is_server_side else 0
@@ -15,6 +16,17 @@ class DendriteProtocol(protocol.Protocol):
       self.reply = None
       self.kind = None
       self.replies = dict( )
+      self.is_logging = is_logging_all_packets
+      self.peer = "<unknown>:0"
+      
+      class Filter(logging.Filter):
+         def filter(filter, record):
+            record.msg = "%s: %s" % (self.peer, record.msg)
+            
+            return True
+      
+      self.log = logging.getLogger("dendrite_protocol")
+      self.log.addFilter(Filter())
    
    def packetReceived(self, message):
       type_name = types.INVERTED_TYPE_IDS[self.kind]
@@ -52,6 +64,8 @@ class DendriteProtocol(protocol.Protocol):
       if reply == None:
          reply = self.sent_message_id
       
+      response = None
+      
       if "response" in dargs:
          response = dargs.get("response")
       elif len(dargs) > 0:
@@ -62,10 +76,6 @@ class DendriteProtocol(protocol.Protocol):
                raise ValueError("unexpected failure: %s" % fields[0])
             else:
                raise ValueError("unexpected response: %s" % name)
-      else:
-         def empty(*vargs, **dargs):
-            print "handle_unexpected_reply(*%s, **%s)" % (vargs, dargs)
-         response = None # empty
       
       if response:
          self.replies[self.sent_message_id] = response
@@ -74,14 +84,25 @@ class DendriteProtocol(protocol.Protocol):
       
       header = struct.pack(PACKET_HEADER, reply, types.TYPE_IDS[kind], len(message))
       
-      if self.is_server_side:
-         pass # print "C<-S %s" % repr(dict(id=self.sent_message_id, reply=reply, kind=kind, body=message))
+      if self.is_logging:
+         print "C<-S %s" % repr (dict (
+            id = self.sent_message_id,
+            reply = reply,
+            kind = kind,
+            body = message
+         ))
       
       self.transport.write(header)
       self.transport.write(message)
       self.sent_message_id += 2
    
    def connectionMade(self):
+      self.peer = "%s:%s" % (
+         self.transport.getPeer().host,
+         self.transport.getPeer().port
+      )
+      self.log.info("Connection made.")
+      
       def send(*vargs, **dargs):
          self.sendPacket(reply=None, *vargs, **dargs)
       
@@ -101,6 +122,8 @@ class DendriteProtocol(protocol.Protocol):
       self.connection.initialize_connection()
    
    def connectionLost(self, reason=None):
+      self.log.info("Connection lost: %s" % reason.getErrorMessage())
+      
       self.connection.terminate_connection()
    
    def dataReceived(self, data):
@@ -119,8 +142,13 @@ class DendriteProtocol(protocol.Protocol):
 
          if self.length >= 0:
             if len(self.buffer) >= self.length:
-               if self.is_server_side:
-                  pass # print "C->S %s" % repr(dict(id=self.received_message_id, reply=self.reply, kind=types.INVERTED_TYPE_IDS[self.kind], body=self.buffer[:self.length]))
+               if self.is_logging:
+                  print "C->S %s" % repr (dict (
+                     id = self.received_message_id,
+                     reply = self.reply,
+                     kind = types.INVERTED_TYPE_IDS[self.kind],
+                     body = self.buffer[:self.length]
+                  ))
                self.packetReceived(self.buffer[:self.length])
                self.buffer = self.buffer[self.length:]
                self.length = -1

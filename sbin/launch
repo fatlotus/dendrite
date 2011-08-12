@@ -4,4 +4,4 @@
 # This script basically just acts as a UNIX-friendly
 # wrapper around the python interpreter.
 
-PYTHONPATH=src python src/dendrite
+PYTHONPATH=src:lib python src/dendrite
