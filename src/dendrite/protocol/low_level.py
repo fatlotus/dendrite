@@ -17,7 +17,6 @@ class PrefixFilter(object):
       return record
 
 class DendriteProtocol(protocol.Protocol):
-   protocol_logger = logging.getLogger('protocol')
    nonce = 0
    
    def __init__(self, is_logging_all_packets=False):
@@ -31,7 +30,7 @@ class DendriteProtocol(protocol.Protocol):
       self.is_logging = is_logging_all_packets
       
       DendriteProtocol.nonce += 1
-      self.log = self.protocol_logger.getChild(str(DendriteProtocol.nonce))
+      self.log = logging.getLogger('dendrite.protocol.%i' % DendriteProtocol.nonce)
       self.peer = "<unknown>:0"
    
    def handleException(self, exc):
