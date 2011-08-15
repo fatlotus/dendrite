@@ -4,6 +4,7 @@ import re
 import json
 import overrides
 import http_helper
+import dendrite.diff
 
 LOGIN_URL = "https://www.globusonline.org/authenticate"
 GOST_EXTRACTOR = r">GOST\.override\((.+?)\);</script>"
@@ -62,8 +63,10 @@ class Request(object):
    def listen(self, update, failure):
       def set_initial_content(content):
          def differencing(body):
-            if body != content:
-               update("refresh", body)
+            changes = dendrite.diff.diff(content, body)
+            
+            for (kind, data) in changes:
+               update(kind, data)
             
             if not self.cancelled:
                reactor.callLater(POLL_DELAY, set_initial_content, content)
