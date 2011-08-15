@@ -38,7 +38,7 @@ def authenticate(username, password, info=None):
          for cookie in f.response_headers.get("set-cookie", []):
             match = re.match(SAML_EXTRACTOR, cookie)
             if match is not None:
-               return { "auth_cookie" : match.group(1) }
+               return { "auth_cookie" : match.group(1), 'username' : username }
          
    
    f.deferred.addCallback(success)

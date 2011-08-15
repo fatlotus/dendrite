@@ -36,7 +36,7 @@ class DendriteProtocol(protocol.Protocol):
    def handleException(self, exc):
       self.log.exception(exc)
       self.sendPacket("failure", "Error", "An error occurred.")
-      self.tranport.close()
+      self.transport.loseConnection()
    
    def packetReceived(self, message):
       try:

@@ -12,6 +12,7 @@ class Record(object):
       self.identifier = identifier
       self.username = username
       self.database = database
+      self.options = { }
       self.last_updated = 0
    
    def refresh(self):
@@ -42,6 +43,7 @@ class Record(object):
       del self.database.people[self.username]
       # <CLOSE TRANSACTION>
 
+
 class Database(object):
    def __init__(self):
       self.people = { }
@@ -69,13 +71,31 @@ class Database(object):
    def set_notifies_in_background(self, username, deviceID, notifies):
       if notifies:
          # <OPEN TRANSACTION>
-         self.people[username] = Device(username, deviceID)
+         self.people[username] = Record(self, username, deviceID)
          # <CLOSE TRANSACTION>
-      else:
+      elif username in self.people:
          self.people[username].cancel()
    
    # Is this person requesting notifications?
    #
    # Note that "requesting notifications" and "receiving them"
+   # are two entirely different states.
    def is_notifying_in_background(self, username):
-      return not(self.people[username].is_cancelled())
+      return username in self.people
+   
+   # This method returns the current notifications configuration
+   # that the end-user has created.
+   #
+   def get_notification_options(self, username):
+      if username in self.people:
+         return self.people[username].options.copy()
+      else:
+         return None
+   
+   # Sets the current notification configuration that the end-user
+   # has created.
+   # 
+   def set_notification_options(self, username, options):
+      if username in self.people:
+         self.people[username].options = options.copy()
+      

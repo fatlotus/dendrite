@@ -53,33 +53,29 @@ class ServerSideConnection():
       reply_to_session("data", self._session)
    
    def received_login(self, reply_to_login, username, password):
-      def try_authenticate(userAgent):
+      def try_authenticate(userAgent, deviceID):
          def login_succeeded(result):
             if not self.is_authenticated():
                reply_to_login("success")
-               self._session = result
+               self._session = result.copy()
+               self._session['deviceID'] = deviceID
+               self._session['userAgent'] = userAgent
          
          def login_failed(err):
-            logging.warn("Login failure for account %s" % repr(username))
+            self._log.warn("Login failure for account %s" % repr(username))
          
             reply_to_login("failure", "LoginFailed", err.getErrorMessage())
             self._session = None
          
-         d = self._backend.authenticate(username, password, info=userAgent)
+         d = self._backend.authenticate(username, password)
          d.addCallback(login_succeeded)
          d.addErrback(login_failed)
       
       def identify_succeeded(reply, cancel, userAgent, deviceID):
-         logging.info("Client: %s" % userAgent)
-         try_authenticate(userAgent)
+         self._log.info("Client: %s" % repr(userAgent))
+         try_authenticate(userAgent, deviceID)
       
-      def identify_failed(reply, cancel, err):
-         logging.warn("Failed to identify client.")
-         try_authenticate("(unknown)")
-      
-      try_authenticate("none")
-      self.send("identify", identity=identify_succeeded,
-         failure=identify_failed)
+      self.send("identify", identity=identify_succeeded)
    
    @requires_authentication
    def received_fetch(self, reply, method, url, query_string, body):

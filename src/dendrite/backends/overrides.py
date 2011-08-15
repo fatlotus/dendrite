@@ -1,5 +1,7 @@
 from twisted.internet import defer
 from dendrite.backends import http_helper
+from dendrite import storage
+from dendrite import devices
 import urlparse
 import urllib
 import json
@@ -13,12 +15,50 @@ APIs = {
 def custom_api(request):
    d = defer.Deferred()
    
-   if request["url"] == "dendrite/session":
-      d.callback(request["session"])
-   elif request["url"] == "dendrite/nonce":
-      d.callback("{\"time\":%i}" % (int(time.time() / 10)))
+   if request["url"] == "dendrite/aboutme" and request["method"].upper() == "GET":
+      # Returns some basic information about the current user.
+      d.callback("{\"fullname\":\"Joe User\",\"email\":\"email@address.com\"}")
+      
+   elif request["url"] == "dendrite/background":
+      # Gets and sets information about background notification.
+      
+      # First, we retrieve the (hopefully cached) connection
+      # to the backend.
+      storage_backend = storage.choose_backend()
+      username = request['session']['username']
+      userAgent = request['session']['userAgent']
+      deviceID = request['session']['deviceID']
+      device = devices.create_backend(userAgent, deviceID, storage_backend)
+      
+      if request["method"].upper() == "GET":
+         result = storage_backend.get_notification_options(username)
+         
+         if result is None:
+            result = device.default_options()
+         
+         result['enabled'] = storage_backend.is_notifying_in_background(username)
+         
+         d.callback(json.dumps(result))
+         
+      elif request["method"].upper() == "POST":
+         try:
+            options = json.loads(request['body'])
+         except Exception:
+            d.errback(Exception('Invalid JSON: %s' % repr(request['body'])))
+         else:
+            enabled = options['enabled']
+            del options['enabled']
+            
+            if not device.validate_options(options):
+               d.errback(Exception('Invalid options.'))
+            else:
+               storage_backend.set_notifies_in_background (
+                 username, deviceID, enabled)
+               storage_backend.set_notification_options(username, options)
+               
+               d.callback('{}')
    else:
-      d.errback('404 File Not Found')
+      d.errback(Exception('404 File Not Found'))
    
    return d
 
