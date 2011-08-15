@@ -7,8 +7,11 @@
 # # 
 # # As with anything on UNIX, you need to enable the "user"
 # # property to use a port below 1024.
+# # 
+# # If this property is disabled, this instance acts as a
+# # stateless "slave" node that merely manages polling.
 # #
-listen_port: 1337
+# listen_port: 1337
 
 # # The setuid() user to run as (either a UID or a name).
 # # 

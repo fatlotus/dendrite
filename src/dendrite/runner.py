@@ -9,7 +9,7 @@ import logging
 import signal
 
 def start_server(config={ }):
-   port       = config.get("listen_port", 1337)
+   port       = config.get("listen_port", None)
    backlog    = config.get("accept_backlog", 1024)
    fd_limit   = config.get("file_descriptor_limit", None)
    user       = config.get("user", None)
@@ -52,10 +52,11 @@ def start_server(config={ }):
          )
          return 1
    
-   logging.info("Opening Dendrite on :%s..." % port)
+   if port:
+      logging.info("Opening Dendrite on :%s..." % port)
    
-   reactor.listenTCP(port, dendrite.protocol.ServerFactory(config),
-      backlog=backlog)
+      reactor.listenTCP(port, dendrite.protocol.ServerFactory(config),
+         backlog=backlog)
    
    if os.geteuid() is 0:
       logging.warn("The Dendrite server is not tested to run EUID root.")
