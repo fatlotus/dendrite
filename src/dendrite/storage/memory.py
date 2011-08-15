@@ -46,8 +46,7 @@ class Database(object):
    def __init__(self):
       self.people = { }
    
-   # Retrieves count devices who are currently "waiting
-   # for a daemon" or "expired."
+   # Retrieves "count" devices from the queue.
    def retrieve_devices(self, count=100):
       results = [ ]
       
@@ -80,18 +79,3 @@ class Database(object):
    # Note that "requesting notifications" and "receiving them"
    def is_notifying_in_background(self, username):
       return not(self.people[username].is_cancelled())
-   
-   # Simple statistics: this method calculates roughly how
-   # many devices are currently requesting notifications.
-   def count_requesting_devices(self):
-      return len(self.people)
-   
-   # This method calculates the number of devices with 
-   # expired backends. If expired()/requesting() is too
-   # high then the server is getting overloaded.
-   def count_expired_devices(self):
-      count = 0
-      for record in self.people.values():
-         if record.is_expired():
-            count += 1
-      return count
