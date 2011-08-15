@@ -1,6 +1,6 @@
 import difflib
 
-def id_of(item):
+def _id_of(item):
    if "id" in item:
       return item["id"]
    elif "href" in item:
@@ -9,7 +9,7 @@ def id_of(item):
       return item["task_id"]
    elif "canonical_name" in item:
       return item["canonical_name"]
-   
+
 def diff(a, b):
    """
    Calculates a list of tuples (type, data) of the changes between the old and
@@ -20,6 +20,9 @@ def diff(a, b):
    
    changes = [ ]
    
+   if a == b:
+      return [ ]
+      
    try:
       if a["DATA_TYPE"] != b["DATA_TYPE"]:
          raise ValueError
@@ -33,9 +36,11 @@ def diff(a, b):
       matcher = difflib.SequenceMatcher()
       matcher.set_seqs(a_ids, b_ids)
       
-      for (opcode, sa, ea, sb, eb) in s.get_opcodes():
+      print repr(matcher.get_opcodes())
+      
+      for (opcode, sa, ea, sb, eb) in matcher.get_opcodes():
          if opcode == "equal":
-            for offset in xrange(0, sa - ea):
+            for offset in xrange(0, ea - sa):
                if a["DATA"][sa + offset] != b["DATA"][sb + offset]:
                   changes.append(('update', {
                      'index' : sa + offset,
@@ -43,12 +48,23 @@ def diff(a, b):
                   }))
                   
          elif opcode == "replace":
-            for offst in xrange(sa, ea):
-               changes.append(('remove' {
-                  'index' : sa
+            for offst in xrange(0, eb - sb):
+               changes.append(('remove', {
+                  'index' : sa + offst
                }))
-         print "DIFFERNECE: %s" % repr(item)
-      
+               changes.append(('insert', {
+                  'index' : sa + offst,
+                  'data' : b["DATA"][sb + offst]
+               }))
+         elif opcode == "insert":
+            for offst in xrange(0, eb - sb):
+               changes.append(('insert', {
+                  'index' : sa,
+                  'data': b["DATA"][sb + offst]
+               }))
+         else:
+            raise ValueError("unhandled option: %s" % opcode)
+         
    except (ValueError, IndexError):
       changes = [ ("refresh", b) ]
    
