@@ -74,7 +74,7 @@ def diff(a, b):
             # new data.
             
             # Iterate through all things not in the final value.
-            for offst in xrange(0, ea - sa):
+            for offset in xrange(0, ea - sa):
                
                # Don't add + offst because we're removing as-we-go.
                changes.append(('remove', {
@@ -83,30 +83,30 @@ def diff(a, b):
             
             # Iterate through all items inserted relative to the
             # initial list.
-            for offst in xrange(0, eb - sb):
+            for offset in xrange(0, eb - sb):
                
                # Insert it in the correct order (+offst) using the
                # final data.
                changes.append(('insert', {
-                  'index' : sa + offst,
-                  'data' : b["DATA"][sb + offst]
+                  'index' : sa + offset,
+                  'data' : b["DATA"][sb + offset]
                }))
             
          elif opcode == "insert":
             
             # Treat insertions as above: use the final length but
             # the initial offsets and final data.
-            for offst in xrange(0, eb - sb):
+            for offset in xrange(0, eb - sb):
                changes.append(('insert', {
                   'index' : sa,
-                  'data': b["DATA"][sb + offst]
+                  'data': b["DATA"][sb + offset]
                }))
          
          elif opcode == "delete":
             
             # Treat deletions as with replace: use the initial
             # indices and delete incrementally.
-            for offst in xrange(0, ea - sa):
+            for offset in xrange(0, ea - sa):
                
                # Don't add + offst because we're removing as-we-go.
                changes.append(('remove', {
