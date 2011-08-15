@@ -7,7 +7,19 @@ import logging
 
 PACKET_HEADER = "!IBI"
 
+class PrefixFilter(object):
+   def __init__(self, prefix):
+      self.prefix = prefix
+   
+   def filter(self, record):
+      record.msg = "%s: %s" % (self.prefix, record.msg)
+      
+      return record
+
 class DendriteProtocol(protocol.Protocol):
+   protocol_logger = logging.getLogger('protocol')
+   nonce = 0
+   
    def __init__(self, is_logging_all_packets=False):
       self.buffer = ""
       self.length = -1
@@ -17,20 +29,14 @@ class DendriteProtocol(protocol.Protocol):
       self.kind = None
       self.replies = dict( )
       self.is_logging = is_logging_all_packets
+      
+      DendriteProtocol.nonce += 1
+      self.log = self.protocol_logger.getChild(str(DendriteProtocol.nonce))
       self.peer = "<unknown>:0"
-      
-      class Filter(logging.Filter):
-         def filter(filter, record):
-            record.msg = "%s: %s" % (self.peer, record.msg)
-            
-            return True
-      
-      self.log = logging.getLogger("dendrite_protocol")
-      self.log.addFilter(Filter())
    
    def handleException(self, exc):
-      self.log.exception(esc)
-      self.sendMessage("failure", "Error", "An error occurred.")
+      self.log.exception(exc)
+      self.sendPacket("failure", "Error", "An error occurred.")
       self.tranport.close()
    
    def packetReceived(self, message):
@@ -105,10 +111,11 @@ class DendriteProtocol(protocol.Protocol):
       self.sent_message_id += 2
    
    def connectionMade(self):
-      self.peer = "%s:%s" % (
+      peer = "%s:%s" % (
          self.transport.getPeer().host,
          self.transport.getPeer().port
       )
+      self.log.addFilter(PrefixFilter(peer))
       self.log.info("Connection made.")
       
       def send(*vargs, **dargs):
