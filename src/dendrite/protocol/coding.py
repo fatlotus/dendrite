@@ -123,6 +123,15 @@ def encode(types, values):
 # Decodes the fields from the given message given a list 
 # of python types do decode from.
 def decode(message, kinds):
+   # Input sanity checks.
+   # 
+   # This turned out to be quite important during testing.
+   if type(message) is not str:
+      raise TypeError("Message must be a string.")
+   
+   if not(type(kinds) in (list,tuple)):
+      raise TypeError("Kinds must be a list or tuple of types.")
+   
    # Offsetting and slicing is, I think, one of the faster
    # ways to access a buffer in Python.
    offset = 0
@@ -153,7 +162,7 @@ def decode(message, kinds):
             # Integers are pretty easy: we just unpack and bump the
             # offset variable.
             values.extend(struct.unpack_from('!i', message, offset))
-            offset += struct.calcsize('i')
+            offset += struct.calcsize('!i')
             
          elif kind is bool:
             # Parse the boolean as a single byte and increase the
@@ -177,7 +186,7 @@ def decode(message, kinds):
             # Unsigned is pretty much just like signed, above, since
             # struct does all of our work for us.
             values.extend(struct.unpack_from('!I', message, offset))
-            offset += struct.calcsize('I')
+            offset += struct.calcsize('!I')
    
    # Treat any struct parsing errors or unicode parsing errors
    # as ValueErrors and propagate to the caller.
