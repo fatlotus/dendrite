@@ -30,6 +30,7 @@ class _sender(object):
    def __init__(self, protocol, reply_to):
       self.protocol = protocol
       self.reply_to = reply_to
+      self.session = protocol.session
       
       if reply_to:
          # If I'm not a global handler, then set
@@ -39,9 +40,7 @@ class _sender(object):
          # Otherwise just set it to self.
          self.origin = self
    
-   # Too clever by half, mark my words.
-   #
-   # This method installs a proxy method for the
+   # This class method installs a proxy method for the
    # specified protocol message type name.
    @classmethod
    def _install(klass, name):
@@ -66,7 +65,25 @@ class DendriteProtocol(protocol.Protocol):
       self.incoming_nonce = 0 if is_initiator else 1
       self.outgoing_nonce = 1 if is_initiator else 0
       self.reply_handlers = { }
+      
+      # This variable warrants further explanation: it is used to
+      # track per-connection state, and so will never be used within
+      # this class, since that is application-specific. It is
+      # accessible through _sender#session, however, and that is 
+      # the preferred way of accessing it.
+      # 
+      # Note that this value must never be reassigned: since the
+      # dict type is mutable, all mutations must be to the same
+      # instance, lest we risk inconsistent state across 
+      # references.
+      self.session = { }
+      
+      # The global handler is a proxy object that sends objects
+      # with no "reply-to" field. In an RPC metaphor, it
+      # encapsulates the "default callee" whenever there is
+      # none to reply to.
       self.global_handler = _sender(self, None)
+       
    
    ### Public API ###
    #
@@ -153,6 +170,7 @@ class DendriteProtocol(protocol.Protocol):
       # We copy the dict of responses just for safety. It's often
       # easier if mutable types are protected, particularly in 
       # dynamic languages like Python.
+      
       self.reply_handlers[self.outgoing_nonce] = responses.copy()
       
       # Get the numeric type ID from the mapping.
@@ -172,11 +190,19 @@ class DendriteProtocol(protocol.Protocol):
          raise ValueError("Message type %s has no argument types "
           "defined." % message_name)
       
+      # Extra validation step for prettier validations.
+      if len(argument_types) != len(args):
+         raise TypeError("API call %s takes %i argument(s) (%i given)" %
+            (repr(message_name), len(argument_types), len(args))
+         )
+      
       # Encode the message arguments given the types.
       # 
       # Any errors in message packing are the fault of the 
       # user. Blame him, and do not mask backtraces.
       message_body = coding.encode(argument_types, args)
+      
+      #LOGGING
       
       # Construct the header, and write it to the stream.
       header = (reply_to, message_type, len(message_body))
@@ -253,6 +279,8 @@ class DendriteProtocol(protocol.Protocol):
                   self.handle_protocol_error('Unknown type ID %i' % self.header[1])
                   return
                
+               #LOGGING
+               
                # Retrieve the statically-allocated field types from the list.
                try:
                   argument_types = types.FIELD_TYPES[type_name]
@@ -322,7 +350,7 @@ class DendriteProtocol(protocol.Protocol):
                      handler = handlers[type_name]
                   except KeyError:
                      self.handle_protocol_error (
-                        'No reply handler for %i '
+                        'No reply handler in %i '
                         'for %s messages' % (in_reply_to, type_name)
                      )
                      return

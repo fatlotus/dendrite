@@ -72,7 +72,8 @@ def encode(types, values):
             # only as a result of programmer error.
             # 
             if type(value) is not kind:
-               raise TypeError, "value %s must of be of type %s" % (value, kind)
+               raise TypeError(
+                 "value %s must of be of type %s" % (repr(value), kind))
                
             elif kind in (str, unicode, dict):
                # Encode structured data first.
