@@ -1,7 +1,7 @@
 from dendrite.protocol import coding
 import unittest
 
-TYPES = (int, str, unicode, dict, 'unsigned')
+TYPES = (int, str, unicode, dict, 'unsigned', bool)
 
 class TestEncoding(unittest.TestCase):
    def initialize_type(self, kind):
@@ -13,6 +13,8 @@ class TestEncoding(unittest.TestCase):
          return 1 << 32l - 1
       elif kind == int:
          return -1
+      elif kind == bool:
+         return True
       else:
          return kind()
    
@@ -36,3 +38,12 @@ class TestEncoding(unittest.TestCase):
          for b in TYPES:
             for c in TYPES:
                self.verify(a, b, c)
+   
+   def test_invalid_boolean(self):
+      self.assertRaises(ValueError, lambda: coding.decode("A", [ bool ]))
+   
+   def test_range_integers(self):
+      self.assertRaises(ValueError, lambda: coding.encode([ 'unsigned' ], [ 2**32 ]))
+      self.assertRaises(ValueError, lambda: coding.encode([ int ], [ 2**31 ]))
+      self.assertRaises(ValueError, lambda: coding.encode([ 'unsigned' ], [ -1 ]))
+      self.assertRaises(ValueError, lambda: coding.encode([ int ], [ -2**31 ]))
