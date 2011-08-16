@@ -2,7 +2,7 @@ from twisted.internet import defer, reactor
 import twisted
 import re
 import json
-import overrides
+import api_helper
 import http_helper
 import dendrite.diff
 
@@ -12,7 +12,7 @@ SAML_EXTRACTOR = r"\Asaml=(\".+?\");"
 
 POLL_DELAY = 10
 
-def authenticate(username, password, info=None):
+def authenticate(username, password):
    f = http_helper.fetch(LOGIN_URL, 
       post={'username' : username, 'password' : password})
    
@@ -56,7 +56,7 @@ class Request(object):
       self.cancelled = False
    
    def fetch(self, success, failure):
-      d = overrides.fetch_api(self)
+      d = api_helper.fetch_api(self)
       d.addCallback(lambda body: success(body))
       d.addErrback(lambda f: failure("RequestFailed", f.getErrorMessage()))
    
