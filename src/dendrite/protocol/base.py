@@ -6,7 +6,7 @@
 # information about all the various packet
 # fields and options.
 
-from twisted.internet import protocol
+from twisted.internet import protocol, ssl
 import struct
 from dendrite.protocol import types, coding
 
@@ -29,23 +29,85 @@ PACKET_HEADER = struct.Struct('!IBI')
 class _sender(object):
    def __init__(self, protocol, reply_to):
       self.protocol = protocol
+      self.reply_to = reply_to
+      
+      if reply_to:
+         # If I'm not a global handler, then set
+         # it to be one.
+         self.origin = self.protocol.global_handler
+      else:
+         # Otherwise just set it to self.
+         self.origin = self
+   
+   # Too clever by half, mark my words.
+   #
+   # This method installs a proxy method for the
+   # specified protocol message type name.
+   @classmethod
+   def _install(klass, name):
+      def inner(self, *fields, **responders):
+         return self.protocol.send(name, self.reply_to, fields, responders)
+      
+      setattr(klass, name, inner)
 
+# We need to patch the _sender class so that every possible
+# message type has a proxy method defined.
 for name in types.TYPE_IDS.keys():
-   def inner(*args):
-      print "INNER: %s" % repr(args)
-   
-   setattr(_sender, name, inner)
-   
-   del inner
+   _sender._install(name)
 
 class DendriteProtocol(protocol.Protocol):
-   def __init__(self, adapter=None, is_initiator=False):
+   # Public constructor. Adapter can be null, in which case
+   # it must be set later via proto.adapter = _.
+   def __init__(self, is_initiator, adapter=None, identifier=""):
       self.adapter = adapter
       self.buffer = ""
       self.header = None
+      self.is_initiator = is_initiator
       self.incoming_nonce = 0 if is_initiator else 1
       self.outgoing_nonce = 1 if is_initiator else 0
       self.reply_handlers = { }
+      self.global_handler = _sender(self, None)
+   
+   ### Public API ###
+   #
+   
+   # This helper method creates a twisted.internet.Factory
+   # instance suitable for running this Protocol. This factory,
+   # conveniently enough, also duck-types as an SSL context 
+   # factory that can be used for calls like connectSSL and 
+   # listenSSL.
+   # 
+   # Unlike the constructor above, the adapter parameter
+   # is not optional.
+   @classmethod
+   def build_factory(klass, adapter, is_initiator):
+      # Create an annonymous factory. Is it bad that we just made
+      # a static metafactory?
+      
+      class _Factory(protocol.ClientFactory):
+         
+         # This is the only method defined for the type *ContextFactory
+         # 
+         # (Duck-typing can be quite convenient in situations like this!)
+         def getContext(self):
+            if is_initiator:
+               # Client authentication using SSL is optional.
+               if hasattr(adapter, "provide_client_ssl_context"):
+                  return adapter.provide_client_ssl_context()
+               else:
+                  # If the adapter doesn't provice client authentication,
+                  # then assume that there is none.
+                  return ssl.ClientContextFactory().getContext()
+            else:
+               # The adapter must provide a server SSL context
+               # since servers are always authenticated.
+               return adapter.provide_server_ssl_context()
+         
+         # Builds an instance of klass, as appropriate.
+         def buildProtocol(self, address):
+            return klass(is_initiator, adapter, identifier=address)
+      
+      return _Factory()
    
    ### Helper methods ###
    # 
@@ -55,8 +117,21 @@ class DendriteProtocol(protocol.Protocol):
    # Unlike raise, exc can be either a str or 
    # an Exception.
    def handle_protocol_error(self, exc=None):
-      print repr(exc)
-      # self.transport.loseConnection()
+      
+      # Check to see if the adapter can deal with it.
+      if hasattr(self.adapter, "handle_protocol_error"):
+         
+         # Allow the adapter time to send a "failure" response,
+         # if it desires, but ensure that the protocol is always
+         # closed.
+         self.adapter.handle_protocol_error(exc)      
+         self.transport.loseConnection()
+      else:
+         
+         # If we're not handling the exception, still close it,
+         # but also raise an exeption (which Twisted will log.)
+         self.transport.loseConnection()
+         raise Exception(exc)
    
    # Sends a message given the reply_to fields
    # and arguments. This method is not designed
@@ -67,22 +142,22 @@ class DendriteProtocol(protocol.Protocol):
    # Args is a list of (strongly-typed) arguments.
    # Responses is a mapping of message type names to
    #  lambdas.
-   def send(message_name, reply_to, args, responses):
+   def send(self, message_name, reply_to, args, responses):
       # If this is a global message, then set the reply-to
       # to be the outgoing message ID.
       if reply_to is None:
-         reply_to = self.outgoing_message_nonce
+         reply_to = self.outgoing_nonce
       
       # If there are any responses, then record them for later.
       #
       # We copy the dict of responses just for safety. It's often
       # easier if mutable types are protected, particularly in 
       # dynamic languages like Python.
-      self.reply_handlers[self.outgoing_message_nonce] = responses.copy()
+      self.reply_handlers[self.outgoing_nonce] = responses.copy()
       
       # Get the numeric type ID from the mapping.
       try:
-         message_type = types.TYPE_IDs[message_name]
+         message_type = types.TYPE_IDS[message_name]
       except KeyError:
          raise ValueError("Unknown message type: %s" % message_name)
       
@@ -101,11 +176,11 @@ class DendriteProtocol(protocol.Protocol):
       # 
       # Any errors in message packing are the fault of the 
       # user. Blame him, and do not mask backtraces.
-      message_body = coding.encode(message_arg_types, args)
+      message_body = coding.encode(argument_types, args)
       
       # Construct the header, and write it to the stream.
       header = (reply_to, message_type, len(message_body))
-      self.transport.write(PACKET_HEADER.pack())
+      self.transport.write(PACKET_HEADER.pack(*header))
       
       # Write the message body out to the stream as well.
       self.transport.write(message_body)
@@ -118,9 +193,17 @@ class DendriteProtocol(protocol.Protocol):
    # (with their strange camelCased
    # callback names... ugh.)
    
+   # Called when the connection has been made, as would seem 
+   # relatively self-explanatory. This method is useful for 
+   # sending the initial TLS request and beginning
+   # protocol interchange.
+   def connectionMade(self):
+      if hasattr(self.adapter, 'connected'):
+         self.adapter.connected(self.global_handler)
+   
    # Called whenever there is new data to be processed on the TCP
    # stream, or whatever we're testing this against.
-   def dataReceived(self, data):   
+   def dataReceived(self, data):
       self.buffer += data   
       
       # This is a loop to process multiple packets
@@ -129,7 +212,6 @@ class DendriteProtocol(protocol.Protocol):
       # machine.
       #
       while True:
-         
          # Handle the header fields first.
          if self.header is None:
             if len(self.buffer) >= PACKET_HEADER.size:
@@ -140,7 +222,7 @@ class DendriteProtocol(protocol.Protocol):
                # Slide the buffer forward via slices.
                self.buffer = self.buffer[PACKET_HEADER.size:]
             else:
-               # If the buffer is to small, then wait for more data.
+               # If the buffer is too small, then wait for more data.
                break
          
          # After ensuring that we have a header, process
@@ -155,7 +237,7 @@ class DendriteProtocol(protocol.Protocol):
                in_reply_to = self.header[0]
                
                # Advance the receiving buffer (inefficiently)
-               self.buffer = self.buffer[:self.header[2]]
+               self.buffer = self.buffer[self.header[2]:]
                
                # We're using the standard Pythonic style of try: action
                # except: failure. This is somewhat slower (though the
@@ -180,7 +262,7 @@ class DendriteProtocol(protocol.Protocol):
                    )
                
                try:
-                  args = coding.decode(argument_types, message_body)
+                  args = coding.decode(message_body, argument_types)
                except ValueError, e:
                   # The coding module should mask all other errors 
                   # and route them to ValueErrors.
@@ -194,7 +276,7 @@ class DendriteProtocol(protocol.Protocol):
                #
                # It's a bit obtuse, but it has no edge cases and means that
                # messages are self-describing.
-               if message_id == self.incoming_nonce:
+               if in_reply_to == message_id:
                   
                   # For global messages, just look up a handle_* method and 
                   # remember it.
@@ -214,7 +296,7 @@ class DendriteProtocol(protocol.Protocol):
                   
                   # First, check that it is a message of a parity we could have
                   # sent.
-                  if (in_reply_to % 2) != (self.outgoing_message_nonce % 2):
+                  if (in_reply_to % 2) != (self.outgoing_nonce % 2):
                      self.handle_protocol_error (
                         'Message parity error: received message that could not '
                         'have been sent.'
@@ -226,7 +308,7 @@ class DendriteProtocol(protocol.Protocol):
                   # This helps particularly with underflow, though that's
                   # rather unlikely to occur.
                   #
-                  if in_reply_to >= self.outgoing_message_nonce:
+                  if in_reply_to >= self.outgoing_nonce:
                      self.handle_protocol_error (
                         'Message validation error: received message that could '
                         'not have been sent'
@@ -236,7 +318,7 @@ class DendriteProtocol(protocol.Protocol):
                   # For non-global messages (replies), look up the handler and
                   # retrieve the message.
                   try:
-                     handlers = self.replies[in_reply_to]
+                     handlers = self.reply_handlers[in_reply_to]
                      handler = handlers[type_name]
                   except KeyError:
                      self.handle_protocol_error (
@@ -256,20 +338,23 @@ class DendriteProtocol(protocol.Protocol):
                   # 
                   # Sneaky, huh?
                   def _closure_expect_more_messages():
-                     self.replies[in_reply_to] = handlers
+                     self.reply_handlers[in_reply_to] = handlers
 
                   sender.expect_more = _closure_expect_more_messages
                   
                   # Forget by default.
                   # 
                   # Only you can prevent reference cycles.
-                  del self.replies[in_reply_to]
+                  del self.reply_handlers[in_reply_to]
                
                # Trigger the handler given the origin message.
                handler(sender, *args)
                
                # Increment the incoming message nonce.
                self.incoming_nonce += 2
+               
+               # Clear the header fields, so that we can load another one.
+               self.header = None
                
             # If nothing else, then break out of the loop. We can't parse
             # anything more, so return to the event loop.
