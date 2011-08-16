@@ -17,13 +17,13 @@ root.createcommand('exit', better_exit)
 class Message(Dialog):
    command = "tk_messageBox"
 
-def authenticate(username, password, info=""):
+def authenticate(username, password):
    d = defer.Deferred()
    
    alert = Message(root, icon='info', type='yesno',
       title="Dendrite: Allow authentication?",
       message="Username: %s\nPassword: %s" % (repr(username), repr(password)),
-      detail="Client type: %s\nThese credentials were sent using TLS." % info)
+      detail="Some tests require that you enter valid credentials.")
    result = alert.show()
    
    if result == 'yes':
