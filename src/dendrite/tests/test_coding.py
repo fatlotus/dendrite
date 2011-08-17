@@ -1,49 +1,61 @@
 from dendrite.protocol import coding
-import unittest
+from nose.tools import *
 
 TYPES = (int, str, unicode, dict, 'unsigned', bool)
 
-class TestEncoding(unittest.TestCase):
-   def initialize_type(self, kind):
-      if kind is unicode:
-         return u'\u03c0\u00e9\u00f1\u00bf'
-      elif kind is dict:
-         return { 'str': 'val', 'ary' : [ { '1' : 2, 'bool' : True } ] }
-      elif kind == 'unsigned':
-         return 1 << 32l - 1
-      elif kind == int:
-         return -1
-      elif kind == bool:
-         return True
-      else:
-         return kind()
+@nottest
+def initialize_type(kind):
+   if kind is unicode:
+      return u'\u03c0\u00e9\u00f1\u00bf'
+   elif kind is dict:
+      return { 'str': 'val', 'ary' : [ { '1' : 2, 'bool' : True } ] }
+   elif kind == 'unsigned':
+      return 1 << 32l - 1
+   elif kind == int:
+      return -1
+   elif kind == bool:
+      return True
+   else:
+      return kind()
+
+@nottest
+def verify(*kinds):
+   values = [ initialize_type(kind) for kind in kinds ]
+   results = list(coding.decode(coding.encode(kinds, values), kinds))
    
-   def verify(self, *kinds):
-      values = [ self.initialize_type(kind) for kind in kinds ]
-      results = list(coding.decode(coding.encode(kinds, values), kinds))
-      
-      self.assertEqual(results, values, "before and after encoding not equal.")
+   eq_(results, values, "before and after encoding not equal.")
+
+def test_composite_types():
+   verify()
    
-   def test_composite_types(self):
-      self.verify()
-      
-      for a in TYPES:
-         self.verify(a)
-      
-      for a in TYPES:
-         for b in TYPES:
-            self.verify(a, b)
-      
-      for a in TYPES:
-         for b in TYPES:
-            for c in TYPES:
-               self.verify(a, b, c)
+   for a in TYPES:
+      verify(a)
    
-   def test_invalid_boolean(self):
-      self.assertRaises(ValueError, lambda: coding.decode("A", [ bool ]))
+   for a in TYPES:
+      for b in TYPES:
+         verify(a, b)
    
-   def test_range_integers(self):
-      self.assertRaises(ValueError, lambda: coding.encode([ 'unsigned' ], [ 2**32 ]))
-      self.assertRaises(ValueError, lambda: coding.encode([ int ], [ 2**31 ]))
-      self.assertRaises(ValueError, lambda: coding.encode([ 'unsigned' ], [ -1 ]))
-      self.assertRaises(ValueError, lambda: coding.encode([ int ], [ -2**31 ]))
+   for a in TYPES:
+      for b in TYPES:
+         for c in TYPES:
+            verify(a, b, c)
+
+@raises(ValueError)
+def test_invalid_boolean():
+   coding.decode("A", [ bool ])
+
+@raises(ValueError)
+def test_max_unsigned():
+   coding.encode([ 'unsigned' ], [ 2**32 ])
+
+@raises(ValueError)
+def test_min_unsigned():
+   coding.encode([ 'unsigned' ], [ -1 ])
+
+@raises(ValueError)
+def test_max_int():
+   coding.encode([ int ], [ 2**31 ])
+
+@raises(ValueError)
+def test_min_int():
+   coding.encode([ int ], [ -2**31 ])

@@ -1,6 +1,6 @@
 class Controller(object):
-   def __init__(self, test):
-      self.test = test
+   def __init__(self, shutdown):
+      self.shutdown = shutdown
       self.events = [ ]
    
    # Helpers
@@ -9,14 +9,14 @@ class Controller(object):
    
    # Global callbacks
    def handle_protocol_error(self, error):
-      self.test.tests_complete("Protocol error: %s" % error)
+      self.shutdown("Protocol error: %s" % error)
    
    def handle_failure(self, sender, failure, message):
-      self.test.tests_complete("Foreign error: %s" % message)
+      self.shutdown("Foreign error: %s" % message)
    
    def connected(self, sender):
       def success(*vargs):
-         self.tests.tests_complete (
+         self.shutdown (
             'Allowed to perform action without authentication.')
       
       def failure1(sender2, failure, message):
@@ -41,15 +41,15 @@ class Controller(object):
    def fetched_data(self, sender, data):
       self.event('data')
       
-      self.test.tests_complete()
+      self.shutdown()
    
    # Authentication callbacks
    def authenticated(self, sender):
       if 'identify' not in self.events:
-         self.test.tests_complete("Allowed entry without device identification.")
+         self.shutdown("Allowed entry without device identification.")
       
       if 'auth-bad' not in self.events:
-         self.test.tests_complete("Allowed phoney credentials into server.")
+         self.shutdown("Allowed phoney credentials into server.")
       
       self.event('auth-ok')
       
@@ -60,7 +60,7 @@ class Controller(object):
    
    def authfailure(self, sender, failure, message):
       if 'auth-bad' in self.events:
-         self.test.tests_complete("Blocked a valid (fake) user from the server.'")
+         self.shutdown("Blocked a valid (fake) user from the server.'")
       
       self.event('auth-bad')
       sender.origin.login ('test', 'test',
