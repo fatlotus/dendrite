@@ -1,7 +1,7 @@
 from twisted.internet import defer
 from dendrite.backends import http_helper
 from dendrite import storage
-from dendrite import devices
+from dendrite import services
 import urlparse
 import urllib
 import json
@@ -26,16 +26,19 @@ def custom_api(request):
       # to the backend.
       storage_backend = storage.choose_backend()
       username = request['session']['username']
-      userAgent = request['session']['userAgent']
-      deviceID = request['session']['deviceID']
-      device = devices.create_backend(userAgent, deviceID, storage_backend)
+      service = devices.create_service_for(request['session'], storage_backend)
       
       if request["method"].upper() == "GET":
+         # If we're GETTING the background information, then 
+         # ask the storage layer first.
          result = storage_backend.get_notification_options(username)
          
+         # If not, fallback to the service's defaults.
          if result is None:
-            result = device.default_options()
+            result = service.default_options()
          
+         # Either way, set the "enabled" key to whatever the
+         # storage layer wants.
          result['enabled'] = storage_backend.is_notifying_in_background(username)
          
          d.callback(json.dumps(result))
@@ -46,12 +49,22 @@ def custom_api(request):
          except Exception:
             d.errback(Exception('Invalid JSON: %s' % repr(request['body'])))
          else:
-            enabled = options['enabled']
-            del options['enabled']
+            # We're pulling the 'enabled' option out of the
+            # notifications settings because that's almost a
+            # meta-attribute: it defines whether the other 
+            # attributes are useful.
+            # 
+            # They must still be stored, however, since those
+            # attributes should still be considered
+            # "preferences" for the service.
+            # 
+            enabled = options.pop('enabled')
             
-            if not device.validate_options(options):
+            # Run all validation in a service-specific manner.
+            if not service.validate_options(options):
                d.errback(Exception('Invalid options.'))
             else:
+               # Store all data against the server.
                storage_backend.set_notifies_in_background (
                  username, deviceID, enabled)
                storage_backend.set_notification_options(username, options)

@@ -1,10 +1,7 @@
 from twisted.internet import reactor
 
-class Device(object):
-   def __init__(self, deviceID, storageBackend):
-      pass
-   
-   def poll(self):
+class Service(object):
+   def __init__(self, storageBackend):
       pass
    
    def validate_options(self, options):
