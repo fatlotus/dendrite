@@ -1,11 +1,22 @@
+from twisted.internet import reactor
+from nose.tools import *
+
 class Controller(object):
-   def __init__(self, shutdown):
-      self.shutdown = shutdown
+   def __init__(self):
       self.events = [ ]
    
    # Helpers
    def event(self, name):
       self.events.append(name)
+   
+   def shutdown(self, error=None):
+      try:
+         reactor.stop()
+      except:
+         pass
+      
+      if error:
+         fail(error)
    
    # Global callbacks
    def handle_protocol_error(self, error):
