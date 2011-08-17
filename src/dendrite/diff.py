@@ -110,7 +110,8 @@ def diff(a, b):
                
                # Don't add + offst because we're removing as-we-go.
                changes.append(('remove', {
-                  'index' : sa
+                  'index' : sa,
+                  'data' : a["DATA"][sa + offset]
                }))
          
          else:
