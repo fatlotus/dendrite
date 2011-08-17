@@ -227,6 +227,14 @@ class DendriteProtocol(protocol.Protocol):
       if hasattr(self.adapter, 'connected'):
          self.adapter.connected(self.global_handler)
    
+   # Called whenever the connection is lost, for whatever
+   # reason. This should be used for general cleanup information
+   # and logging, depending on what "reason" is.
+   def connectionLost(self, reason):
+      if hasattr(self.adapter, 'disconnected'):
+         self.adapter.disconnected(self.global_handler, reason)
+   
+   
    # Called whenever there is new data to be processed on the TCP
    # stream, or whatever we're testing this against.
    def dataReceived(self, data):
