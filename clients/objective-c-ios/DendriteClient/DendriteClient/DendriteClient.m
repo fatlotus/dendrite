@@ -26,7 +26,7 @@ DendriteMessageType dendriteMessageTypeTable[] = {
     /*0x04*/ TypeNotify,
     /*0x05*/ TypeCancel,
     /*0x06*/ TypeSession,
-    /*0x07*/ _none,
+    /*0x07*/ TypeRestore,
     /*0x08*/ TypeData,
     /*0x09*/ TypeLogin,
     /*0x0A*/ TypeSuccess,
@@ -53,7 +53,7 @@ char * dendriteMessageArgumentTypesTable[] = {
     /*0x04*/ "sd",
     /*0x05*/ "",
     /*0x06*/ "",
-    /*0x07*/ "!",
+    /*0x07*/ "s",
     /*0x08*/ "d",
     /*0x09*/ "ss",
     /*0x0A*/ "",
@@ -138,13 +138,9 @@ char * dendriteMessageArgumentTypesTable[] = {
 }
 
 + (NSString *)generateDeviceIDString {
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-    UIDevice * device = [UIDevice currentDevice];
+    NSLog(@"Called deprecated method +generateDeviceIDString.");
     
-    return [device uniqueIdentifier];
-#else
     return @"";
-#endif
 }
 
 #pragma mark - Constructors
@@ -174,8 +170,8 @@ char * dendriteMessageArgumentTypesTable[] = {
         connectingPort = port;
         
         NSMutableDictionary * tlsOptions = [NSMutableDictionary dictionaryWithCapacity:1];
-        [tlsOptions setObject:kCFBooleanFalse forKey:kCFStreamSSLValidatesCertificateChain];
-        [tlsOptions setObject:kCFBooleanTrue forKey:kCFStreamSSLAllowsAnyRoot];
+        [tlsOptions setObject:(id)kCFBooleanTrue forKey:(id)kCFStreamSSLValidatesCertificateChain];
+        [tlsOptions setObject:(id)kCFBooleanTrue forKey:(id)kCFStreamSSLAllowsAnyRoot];
         [socket startTLS:tlsOptions];
         
         [socket readDataToLength:9 withTimeout:(NSTimeInterval)(-1.0) tag:kTagWaitingForLength];
@@ -217,7 +213,7 @@ char * dendriteMessageArgumentTypesTable[] = {
         [NSException raise:@"InvalidInvocation" format:@""];
     }
     
-    NSInvocation * invocation = [NSInvocation invocationWithMethodSignature:[delegate methodSignatureForSelector:selector]];
+    NSInvocation * invocation = [NSInvocation invocationWithMethodSignature:[(id<NSObject>)delegate methodSignatureForSelector:selector]];
     [invocation setSelector:selector];
     [invocation retain];
     
@@ -308,14 +304,16 @@ char * dendriteMessageArgumentTypesTable[] = {
 - (void)onSocketDidSecure:(AsyncSocket *)sock
 {
     disconnected = NO;
-    if (delegate != nil && [delegate respondsToSelector:@selector(connectedWithClient:)])
+    if (delegate != nil && [(NSObject *)delegate respondsToSelector:@selector(connectedWithClient:)])
         [delegate connectedWithClient:self];
 }
 
 - (void)onSocket:(AsyncSocket *)sender willDisconnectWithError:(NSError *)error
 {
+    NSLog(@"Connection error: %@", [error localizedDescription]);
+    
     disconnected = YES;
-    if (delegate != nil && [delegate respondsToSelector:@selector(unconnectedWithClient:)])
+    if (delegate != nil && [(NSObject *)delegate respondsToSelector:@selector(unconnectedWithClient:)])
         [delegate unconnectedWithClient:self];
 }
 

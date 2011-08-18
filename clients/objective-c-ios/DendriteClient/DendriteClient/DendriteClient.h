@@ -33,7 +33,8 @@ typedef enum {
     TypeFailure,
     TypeIdentity,
     TypeIdentify,
-    TypeSession
+    TypeSession,
+    TypeRestore
 } DendriteMessageType;
 
 #define kDendriteHighestTypeIDPlusOne 0x0E
