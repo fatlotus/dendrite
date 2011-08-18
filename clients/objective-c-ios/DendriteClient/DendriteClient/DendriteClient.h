@@ -34,10 +34,11 @@ typedef enum {
     TypeIdentity,
     TypeIdentify,
     TypeSession,
-    TypeRestore
+    TypeRestore,
+    TypeText
 } DendriteMessageType;
 
-#define kDendriteHighestTypeIDPlusOne 0x0E
+#define kDendriteHighestTypeIDPlusOne 0x15
 
 extern DendriteMessageType dendriteMessageTypeTable[];
 extern char * dendriteMessageArgumentTypesTable[];

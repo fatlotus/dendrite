@@ -32,7 +32,14 @@ DendriteMessageType dendriteMessageTypeTable[] = {
     /*0x0A*/ TypeSuccess,
     /*0x0B*/ TypeFailure,
     /*0x0C*/ TypeIdentity,
-    /*0x0D*/ TypeIdentify
+    /*0x0D*/ TypeIdentify,
+    /*0x0E*/ _none,
+    /*0x0F*/ _none,
+    /*0x10*/ _none,
+    /*0x11*/ _none,
+    /*0x12*/ _none,
+    /*0x13*/ _none,
+    /*0x14*/ TypeText
 };
 
 /*
@@ -59,7 +66,14 @@ char * dendriteMessageArgumentTypesTable[] = {
     /*0x0A*/ "",
     /*0x0B*/ "ss",
     /*0x0C*/ "ss",
-    /*0x0D*/ ""
+    /*0x0D*/ "",
+    /*0x0E*/ "!",
+    /*0x0F*/ "!",
+    /*0x10*/ "!",
+    /*0x11*/ "!",
+    /*0x12*/ "!",
+    /*0x13*/ "!",
+    /*0x14*/ "s"
 };
 
 #pragma mark - Tag Identifiers
