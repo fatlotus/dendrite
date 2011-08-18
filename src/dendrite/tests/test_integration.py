@@ -6,18 +6,17 @@ from dendrite.backends import stubbackend, pollingbackend
 from dendrite.storage import memory
 from nose.tools import *
 from nose.plugins.attrib import attr
-import os
 import time
+import hashlib
 
 servers = [ ]
 clients = [ ]
 timers = [ ]
 
+nonce = 0
+
 def setup():
-   try:
-      os.unlink('tmp/integration_tests.sock')
-   except:
-      pass
+   pass
 
 def teardown():
    for client in clients:
@@ -26,30 +25,27 @@ def teardown():
       except:
          pass
    
-   time.sleep(1)
-   
    for server in servers:
       try:
          server.loseConnection()
       except:
          pass
-   
-   time.sleep(1)
-   
-   try:
-      os.unlink('tmp/integration_tests.sock')
-   except OSError:
-      pass
 
 @nottest
 def integrate(a, b):
-   nonce = time.time()
+   global nonce
+   
+   nonce += 1
+   
+   filename = ("tmp/%s.sock" %
+      hashlib.sha1('%s-%s' % (nonce, time.time())).hexdigest()[:20]
+   )
    
    facA = base.DendriteProtocol.build_factory(a, is_initiator=True)
    facB = base.DendriteProtocol.build_factory(b, is_initiator=False)
    
-   servers.append(reactor.listenUNIX('tmp/integration_test.sock', facB))
-   clients.append(reactor.connectUNIX('tmp/integration_test.sock', facA))
+   servers.append(reactor.listenUNIX(filename, facB))
+   clients.append(reactor.connectUNIX(filename, facA))
    
    return a.deferred
 
@@ -57,10 +53,10 @@ def integrate(a, b):
 @with_setup(setup, teardown)
 @attr('integration')
 def test_integration():
-   return integrate(test_client.Controller(), frontend.Controller(memory.Database, stubbackend))
+   return integrate(test_client.Controller(), frontend.Controller(stubbackend, memory.Database))
 
 @deferred(timeout=10.0)
 @with_setup(setup, teardown)
 @attr('integration', 'live')
 def test_live_integration():
-   return integrate(test_client.Controller(), frontend.Controller(memory.Database, pollingbackend))
+   return integrate(test_client.Controller(), frontend.Controller(pollingbackend, memory.Database))

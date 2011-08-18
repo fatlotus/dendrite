@@ -26,7 +26,7 @@ class Controller(object):
    
    def connected(self, sender):
       def success(*vargs):
-         self.shutdown (
+         return self.shutdown (
             'Allowed to perform action without authentication.')
          self.event("success")
       
@@ -58,15 +58,15 @@ class Controller(object):
    def fetched_data(self, sender, data):
       self.event('data')
       
-      self.shutdown()
+      return self.shutdown()
    
    # Authentication callbacks
    def authenticated(self, sender):
       if 'identify' not in self.events:
-         self.shutdown("Allowed entry without device identification.")
+         return self.shutdown("Allowed entry without device identification.")
       
       if 'auth-bad' not in self.events:
-         self.shutdown("Allowed phoney credentials into server.")
+         return self.shutdown("Allowed phoney credentials into server.")
       
       self.event('auth-ok')
       
@@ -77,10 +77,10 @@ class Controller(object):
    
    def authfailure(self, sender, failure, message):
       if 'auth-bad' in self.events:
-         self.shutdown("Blocked a valid (fake) user from the server.'")
+         return self.shutdown("Blocked a valid user from the server: %s" % message)
       
       self.event('auth-bad')
-      sender.origin.login ('test', 'test',
+      sender.origin.login ('fatlotus', 'test',
          success=self.authenticated,
          failure=self.authfailure,
       )
