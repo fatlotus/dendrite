@@ -49,6 +49,8 @@ class Service(object):
       
       # Initialize a per-service logger.
       self.logger = logging.getLogger('APNsDaemon')
+      
+      self.logger.info("Inititializing APNs Service")
    
    def add(self, session):
       """
