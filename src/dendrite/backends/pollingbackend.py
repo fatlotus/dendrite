@@ -5,6 +5,8 @@ import json
 import api_helper
 import http_helper
 import dendrite.diff
+import dendrite.storage
+import sys
 
 LOGIN_URL = "https://www.globusonline.org/authenticate"
 GOST_EXTRACTOR = r">GOST\.override\((.+?)\);</script>"
@@ -38,7 +40,12 @@ def authenticate(username, password):
          for cookie in f.response_headers.get("set-cookie", []):
             match = re.match(SAML_EXTRACTOR, cookie)
             if match is not None:
-               return { "auth_cookie" : match.group(1), 'username' : username }
+               return {
+                  'auth_cookie' : match.group(1),
+                  'username' : username,
+                  'storage_backend' : dendrite.storage.choose_backend(),
+                  'api_backend' : sys.modules[__name__]
+               }
          
    
    f.deferred.addCallback(success)
