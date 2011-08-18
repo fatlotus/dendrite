@@ -10,6 +10,7 @@ from twisted.internet import protocol, ssl, address
 import struct
 from dendrite.protocol import types, coding
 import urlparse
+import logging
 
 __all__ = [ "DendriteProtocol" ]
 
@@ -104,7 +105,9 @@ class DendriteProtocol(protocol.Protocol):
       # Create an annonymous factory. Is it bad that we just made
       # a static metafactory?
       
-      class _Factory(protocol.ClientFactory):
+      class _Factory(protocol.ClientFactory, ssl.DefaultOpenSSLContextFactory):
+         def __init__(self):
+            pass
          
          # This is the only method defined for the type *ContextFactory
          # 
@@ -148,17 +151,17 @@ class DendriteProtocol(protocol.Protocol):
    # unix:///tmp/connect.sock => CONNECTS TO /tmp/connect.sock
    #
    @classmethod
-   def connect(klass, reactor, url, adapter):
+   def connect(klass, reactor, url, adapter, **dargs):
       fac = self.build_factory(adapter, is_initiator=True)
       
       result = urlparse.urlparse(url)
       
       if result.scheme == 'ssl':
-         reactor.connectSSL(result.hostname, result.port or 1337, fac, fac)
+         reactor.connectSSL(result.hostname, result.port or 1337, fac, fac, **dargs)
       elif result.scheme == 'tcp':
-         reactor.connectTCP(result.hostname, result.port or 1337, fac)
+         reactor.connectTCP(result.hostname, result.port or 1337, fac, **dargs)
       elif result.scheme == 'unix':
-         reactor.connectUNIX("%s%s" % (result.hostname, result.path))
+         reactor.connectUNIX("%s%s" % (result.hostname, result.path), **dargs)
       else:
          raise ValueError("Unsupported URL scheme: %s" % repr(result.scheme))
    
@@ -181,17 +184,17 @@ class DendriteProtocol(protocol.Protocol):
    # unix:///tmp/connect.sock => CONNECTS TO /tmp/connect.sock
    #
    @classmethod
-   def listen(klass, reactor, url, adapter):
-      fac = self.build_factory(adapter, is_initiator=True)
+   def listen(klass, reactor, url, adapter, **dargs):
+      fac = klass.build_factory(adapter, is_initiator=False)
 
       result = urlparse.urlparse(url)
 
       if result.scheme == 'ssl':
-         reactor.listenSSL(result.port or 1337, fac, fac)
+         return reactor.listenSSL(result.port or 1337, fac, fac, **dargs)
       elif result.scheme == 'tcp':
-         reactor.listenTCP(result.port or 1337, fac)
+         return reactor.listenTCP(result.port or 1337, fac, **dargs)
       elif result.scheme == 'unix':
-         reactor.listenUNIX("%s%s" % (result.hostname, result.path))
+         return reactor.listenUNIX("%s%s" % (result.hostname, result.path), **dargs)
       else:
          raise ValueError("Unsupported URL scheme: %s" % repr(result.scheme))
    
