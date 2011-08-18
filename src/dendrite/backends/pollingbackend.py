@@ -44,6 +44,7 @@ def authenticate(username, password):
                return {
                   'auth_cookie' : match.group(1),
                   'username' : username,
+                  'password' : password,
                   'storage_backend' : dendrite.storage.choose_backend(),
                   'api_backend' : sys.modules[__name__],
                   'container' : container.instance(),

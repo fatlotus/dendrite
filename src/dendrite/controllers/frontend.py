@@ -1,7 +1,9 @@
 # Primary dendrite protocol handler.
 
 from twisted.internet import defer, ssl
+from OpenSSL import rand
 import logging
+from dendrite.controllers import session_helper
 
 class Controller(object):
    # Helper annotations and functions
@@ -38,6 +40,7 @@ class Controller(object):
          'config/keys/localhost.key',
          'config/keys/localhost.crt',
       )
+      self.stored_session_private_key = rand.bytes(1024)
    
    def provide_server_ssl_context(self):
       """
@@ -133,3 +136,21 @@ class Controller(object):
       )
       
       sender.success(cancel=req.cancel)
+   
+   @secure
+   def handle_session(self, sender):
+      """
+      A secured API handler that gets the current session as a
+      flat string that can be stored for a later time. The client
+      can then, hopefully, log back in later with the RESTORE
+      method call.
+      """
+      
+      # Extract the login-relevant subsession.
+      login_session = sender.session['backend_info']
+      
+      # Call the session helper to decrypt the data.
+      data = session_helper.save(self.stored_session_private_key, login_session)
+      
+      # Return it to the client.
+      sender.text(data)
