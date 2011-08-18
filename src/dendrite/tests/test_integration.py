@@ -1,56 +1,66 @@
-from twisted.internet import reactor
+from nose.twistedtools import reactor, deferred
 from dendrite.protocol import base
 from dendrite.tests.controllers import test_client
 from dendrite.controllers import frontend
 from dendrite.backends import stubbackend, pollingbackend
+from dendrite.storage import memory
 from nose.tools import *
 from nose.plugins.attrib import attr
+import os
+import time
 
 servers = [ ]
 clients = [ ]
 timers = [ ]
 
-@nottest
-def teardown():
-   for client in clients:
-      client.disconnect()
-   
-   for server in servers:
-      server.stopListening()
-   
-   for timer in timers:
-      timer.cancel()
-   
+def setup():
    try:
-      reactor.stop()
+      os.unlink('tmp/integration_tests.sock')
    except:
       pass
 
-@nottest
-def shutdown(reason=None):
-   teardown()
+def teardown():
+   for client in clients:
+      try:
+         client.disconnect()
+      except:
+         pass
    
-   print repr(reason)
+   time.sleep(1)
+   
+   for server in servers:
+      try:
+         server.loseConnection()
+      except:
+         pass
+   
+   time.sleep(1)
+   
+   try:
+      os.unlink('tmp/integration_tests.sock')
+   except OSError:
+      pass
 
 @nottest
-def integration_test(a, b):
+def integrate(a, b):
+   nonce = time.time()
+   
    facA = base.DendriteProtocol.build_factory(a, is_initiator=True)
    facB = base.DendriteProtocol.build_factory(b, is_initiator=False)
    
-   servers.append(reactor.listenUNIX('tmp/integration_tests.sock', facB))
-   clients.append(reactor.connectUNIX('tmp/integration_tests.sock', facA))
-   timers.append(reactor.callLater(20, shutdown, 'Test timed out.'))
+   servers.append(reactor.listenUNIX('tmp/integration_test.sock', facB))
+   clients.append(reactor.connectUNIX('tmp/integration_test.sock', facA))
    
-   reactor.run()
+   return a.deferred
 
-@istest
+@deferred(timeout=10.0)
+@with_setup(setup, teardown)
 @attr('integration')
 def test_integration():
-   integration_test(test_client.Controller(), frontend.Controller(stubbackend))
+   return integrate(test_client.Controller(), frontend.Controller(memory.Database, stubbackend))
 
-# # Here there be monsters:
-# 
-# @istest
-# @attr('live-integration')
-# def test_live_integration():
-#    integration_test(test_client.Controller(), frontend.Controller(pollingbackend))
+@deferred(timeout=10.0)
+@with_setup(setup, teardown)
+@attr('integration', 'live')
+def test_live_integration():
+   return integrate(test_client.Controller(), frontend.Controller(memory.Database, pollingbackend))

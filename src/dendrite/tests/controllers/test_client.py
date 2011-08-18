@@ -1,22 +1,21 @@
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from nose.tools import *
 
 class Controller(object):
    def __init__(self):
       self.events = [ ]
+      self.deferred = defer.Deferred()
    
    # Helpers
    def event(self, name):
+      print "EVENTS: %s" % repr(self.events)
       self.events.append(name)
    
    def shutdown(self, error=None):
-      try:
-         reactor.stop()
-      except:
-         pass
-      
       if error:
-         fail(error)
+         self.deferred.errback(Exception(error))
+      else:
+         self.deferred.callback('')
    
    # Global callbacks
    def handle_protocol_error(self, error):
@@ -29,9 +28,12 @@ class Controller(object):
       def success(*vargs):
          self.shutdown (
             'Allowed to perform action without authentication.')
+         self.event("success")
       
       def failure1(sender2, failure, message):
          def failure2(sender3, failure, message):
+            self.event("failure2")
+            
             sender.login ('fred', 'fredspassword',
                success=self.authenticated,
                failure=self.authfailure,
@@ -42,11 +44,15 @@ class Controller(object):
             success=success,
             listen=success
          )
+         
+         self.event("failure1")
       
       sender.fetch('GET', '', '', '',
          failure=failure1,
          data=success
       )
+      
+      self.event("connected")
    
    # Fetch callbacks
    def fetched_data(self, sender, data):
