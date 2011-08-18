@@ -1,6 +1,8 @@
-# import tkbackend
+import logging
 import pollingbackend
 
-# Returns the preferred backend module.
-def preferred(configuration):
-   return pollingbackend
+instance = pollingbackend
+
+def choose_backend():
+   logging.warn("Use of singleton selectors is deprecated.")
+   return instance
