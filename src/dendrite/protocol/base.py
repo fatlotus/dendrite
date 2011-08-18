@@ -6,9 +6,10 @@
 # information about all the various packet
 # fields and options.
 
-from twisted.internet import protocol, ssl
+from twisted.internet import protocol, ssl, address
 import struct
 from dendrite.protocol import types, coding
+import urlparse
 
 __all__ = [ "DendriteProtocol" ]
 
@@ -16,6 +17,8 @@ __all__ = [ "DendriteProtocol" ]
 # 
 # See the specification for details.
 PACKET_HEADER = struct.Struct('!IBI')
+
+# URL Connection Method
 
 # Hidden wrapper class.
 # 
@@ -125,6 +128,72 @@ class DendriteProtocol(protocol.Protocol):
             return klass(is_initiator, adapter, identifier=address)
       
       return _Factory()
+   
+   # This helper connects to the Dendrite instance running on
+   # the specified url with the specified adapter, and runs the
+   # protocol as with a normal connection.
+   # 
+   # This method uses URL parsing internally, and, at the moment,
+   # only supports TCP (with or without SSL), and UNIX domain
+   # sockets. Any HTTP-specific URL features are ignored.
+   #
+   # For TCP connections, the default port for Dendrite is 1337.
+   # 
+   # Ex.
+   # 
+   # tcp://hostname:80 => CONNECT TCP hostname PORT 80
+   # tcp://hostname => CONNECT TCP hostname PORT 1337
+   # ssl://hostname:1337 => CONNECT TCP WITH SSL hostname PORT 1337
+   # unix://tmp/connect.sock => CONNECTS TO ./tmp/connect.sock
+   # unix:///tmp/connect.sock => CONNECTS TO /tmp/connect.sock
+   #
+   @classmethod
+   def connect(klass, reactor, url, adapter):
+      fac = self.build_factory(adapter, is_initiator=True)
+      
+      result = urlparse.urlparse(url)
+      
+      if result.scheme == 'ssl':
+         reactor.connectSSL(result.hostname, result.port or 1337, fac, fac)
+      elif result.scheme == 'tcp':
+         reactor.connectTCP(result.hostname, result.port or 1337, fac)
+      elif result.scheme == 'unix':
+         reactor.connectUNIX("%s%s" % (result.hostname, result.path))
+      else:
+         raise ValueError("Unsupported URL scheme: %s" % repr(result.scheme))
+   
+   # This helper listens to the Dendrite instance running on
+   # the specified url with the specified adapter, and runs the
+   # protocol as with a normal connection.
+   # 
+   # This method uses URL parsing internally, and, at the moment,
+   # only supports TCP (with or without SSL), and UNIX domain
+   # sockets. Any HTTP-specific URL features are ignored.
+   #
+   # For TCP connections, the default port for Dendrite is 1337.
+   # 
+   # Ex.
+   # 
+   # tcp://hostname:80 => LISTEN PORT 80
+   # tcp://hostname => LISTEN PORT 1337
+   # ssl://hostname:1337 => LISTEN TCP WITH SSL PORT 1337
+   # unix://tmp/connect.sock => CONNECTS TO ./tmp/connect.sock
+   # unix:///tmp/connect.sock => CONNECTS TO /tmp/connect.sock
+   #
+   @classmethod
+   def listen(klass, reactor, url, adapter):
+      fac = self.build_factory(adapter, is_initiator=True)
+
+      result = urlparse.urlparse(url)
+
+      if result.scheme == 'ssl':
+         reactor.listenSSL(result.port or 1337, fac, fac)
+      elif result.scheme == 'tcp':
+         reactor.listenTCP(result.port or 1337, fac)
+      elif result.scheme == 'unix':
+         reactor.listenUNIX("%s%s" % (result.hostname, result.path))
+      else:
+         raise ValueError("Unsupported URL scheme: %s" % repr(result.scheme))
    
    ### Helper methods ###
    # 
