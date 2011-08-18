@@ -1,19 +1,28 @@
 from twisted.internet import defer
 
 def authenticate(username, password):
-   # Return a defer.Deferred. Call .errback(msg) with any failure message,
-   # and .callback(status) with the user status (as a dict).
+   """
+   Authenticates the user given their Globus Online username
+   and password, and return a defer.Deferred. Call .errback(msg)
+   with any failure message, and .callback(status) with the user
+   status (as a dict).
+   """
    
    d = defer.Deferred()
    
-   if username == password:
+   if password == 'test':
       d.callback({ 'auth_cookie' : '' })
    else:
       d.errback(Exception('Identity verification failed'))
+       # This joke is no longer funny.
    return d
 
 class Request(object):
    def __init__(self, session, method, url, query_string, body):
+      """
+      Initialize this request given a session context and request
+      information.
+      """
       timer = None
    
    def _update(self, callback):

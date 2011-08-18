@@ -24,9 +24,12 @@ def custom_api(request):
       
       # First, we retrieve the (hopefully cached) connection
       # to the backend.
-      storage_backend = storage.choose_backend()
+      storage_backend = request['session']['storage_backend']
       username = request['session']['username']
-      service = devices.create_service_for(request['session'], storage_backend)
+      container = request['session']['container']
+      user_agent = request['session']['user_agent']
+      device_id = request['session']['device_id']
+      service = container.service(services.choose_service_for(user_agent))
       
       if request["method"].upper() == "GET":
          # If we're GETTING the background information, then 
@@ -66,8 +69,13 @@ def custom_api(request):
             else:
                # Store all data against the server.
                storage_backend.set_notifies_in_background (
-                 username, deviceID, enabled)
+                 username, device_id, enabled)
                storage_backend.set_notification_options(username, options)
+               
+               if enabled:
+                  service.add(session)
+               else:
+                  service.remove(session)
                
                d.callback('{}')
    else:

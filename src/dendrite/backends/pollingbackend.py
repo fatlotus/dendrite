@@ -6,6 +6,7 @@ import api_helper
 import http_helper
 import dendrite.diff
 import dendrite.storage
+from dendrite import container
 import sys
 
 LOGIN_URL = "https://www.globusonline.org/authenticate"
@@ -44,7 +45,10 @@ def authenticate(username, password):
                   'auth_cookie' : match.group(1),
                   'username' : username,
                   'storage_backend' : dendrite.storage.choose_backend(),
-                  'api_backend' : sys.modules[__name__]
+                  'api_backend' : sys.modules[__name__],
+                  'container' : container.instance(),
+                  'user_agent' : None,
+                  'device_id' : None,
                }
          
    
