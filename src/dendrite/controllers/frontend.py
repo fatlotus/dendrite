@@ -1,6 +1,7 @@
 # Primary dendrite protocol handler.
 
 from twisted.internet import defer
+import logging
 
 class Controller(object):
    # Helper annotations and functions
@@ -24,8 +25,9 @@ class Controller(object):
       return inner
    
    # Constructors
-   def __init__(self, backend):
-      self.backend = backend
+   def __init__(self, storage_backend, api_backend):
+      self.storage_backend = storage_backend
+      self.api_backend = api_backend
    
    # Global handlers
    def connected(self, sender):
@@ -53,7 +55,7 @@ class Controller(object):
             sender.failure('AuthenticationFailed', 'Invalid username or password.')
             return ""
          
-         d = self.backend.authenticate(username, password)
+         d = self.api_backend.authenticate(username, password)
          d.addCallback(authentication_success)
          d.addErrback(authentication_failed)
       
@@ -66,7 +68,7 @@ class Controller(object):
    def handle_fetch(self, sender, method, url, query_string, body):
       
       session = sender.session['backend_info']
-      req = self.backend.Request(session, method, url, query_string, body)
+      req = self.api_backend.Request(session, method, url, query_string, body)
       
       req.fetch (
          self.curry(sender, sender.data),
@@ -77,7 +79,7 @@ class Controller(object):
    def handle_listen(self, sender, url, query_string):
       
       session = sender.session['backend_info']
-      req = self.backend.Request(session, method, url, query_string, body)
+      req = self.api_backend.Request(session, method, url, query_string, body)
       
       req.listen (
          self.curry(sender, sender.notify),
