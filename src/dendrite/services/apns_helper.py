@@ -4,7 +4,7 @@ import struct
 
 NOTIFICATION_DELAY = 3600 * 24 # 24-hours
 
-class APNProtocol(protocol.ClientFactory):
+class APNProtocol(protocol.Protocol):
    def __init__(self):
       """
       Initialize this protocol instance.
@@ -172,8 +172,8 @@ class APNProtocol(protocol.ClientFactory):
             # client authentication. Instead, override the default
             # behavior and add in the given certificate information.
             # 
-            ctx = ssl.ClientContextFactory()
-            ctx.use_certificate_file(client_certificate)
+            ctx = ssl.ClientContextFactory.getContext(self)
+            ctx.use_certificate_file(certificate)
             ctx.use_privatekey_file(private_key)
             
             return ctx

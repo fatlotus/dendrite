@@ -1,4 +1,5 @@
 from twisted.internet import reactor
+from dendrite.services import apns_helper
 import logging
 
 # Various configuration options.
@@ -12,7 +13,7 @@ APNS_HOST_PRODUCTION = "gateway.push.apple.com"
 APNS_HOST = APNS_HOST_SANDBOX
 APNS_PORT = 2195
 
-CLIENT_CERTIFICATE = "config/keys/apns.crt"
+CLIENT_CERTIFICATE = "config/keys/apns.pem"
 CLIENT_PRIVATE_KEY = "config/keys/apns.key"
 
 # The APNs adapter "service" that runs the polling request handlers
@@ -33,7 +34,8 @@ class Service(object):
       # custom sockets procol. Since the factory is duck-typed
       # with a ssl.ClientContextFactory, we use it for both the
       # standard host and port.
-      _ = APNProtocol.build_factory()
+      _ = apns_helper.APNProtocol.build_factory (
+       CLIENT_CERTIFICATE, CLIENT_PRIVATE_KEY)
       self.connection = reactor.connectSSL(APNS_HOST, APNS_PORT, _, _)
       
       # Record the deferred for when the connection to the APNs
@@ -44,8 +46,8 @@ class Service(object):
       # Initialize the mapping of usernames to lists of requests
       # and record the backend.
       self.requests = { }
-      self.storageBackend = storageBackend
-      self.apiBackend = apiBackend
+      self.api_backend = api_backend
+      self.storage_backedn = storage_backend
       
       # Initialize a per-service logger.
       self.logger = logging.getLogger('APNsDaemon')
@@ -75,7 +77,7 @@ class Service(object):
       
       # We're monitoring the task list in order to look for changed or
       # updated transfers via the "remove" notification type.
-      task_list = self.apiBackend.Request (session,
+      task_list = self.api_backend.Request (session,
         'GET', 'transfer/task_list', 'filter=status:ACTIVE,INACTIVE', ''
       )
       
