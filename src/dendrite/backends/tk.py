@@ -2,6 +2,7 @@ from Tkinter import *
 from tkCommonDialog import Dialog
 from twisted.internet import defer, tksupport, reactor
 import json
+from dendrite import Component
 
 root = Tk()
 root.withdraw()
@@ -17,28 +18,7 @@ root.createcommand('exit', better_exit)
 class Message(Dialog):
    command = "tk_messageBox"
 
-def authenticate(username, password):
-   d = defer.Deferred()
-   
-   alert = Message(root, icon='info', type='yesno',
-      title="Dendrite: Allow authentication?",
-      message="Username: %s\nPassword: %s" % (repr(username), repr(password)),
-      detail="Some tests require that you enter valid credentials.")
-   result = alert.show()
-   
-   if result == 'yes':
-      d.callback({
-         "fullname" : "TkBackend Test User",
-         "username" : username,
-         "email" : "user@email.tld",
-         "status" : ""
-      })
-   elif result == 'no':
-      d.errback('Invalid username or password')
-   
-   return d
-
-class Request(object):
+class Resource(object):
    def __init__(self, session, method, url, query_string, body):
       self.method = method
       self.url = url
@@ -89,7 +69,9 @@ class Request(object):
             else:
                update("refresh", data)
       
-      Button(window, text="Send response", command=trigger_update).grid(row=5, column=1)
+      Button(window,
+       text="Send response",
+       command=trigger_update).grid(row=5, column=1)
    
    def fetch(self, success, failure):
       self._make_ui(True, success, failure)
@@ -97,60 +79,27 @@ class Request(object):
    def listen(self, update, failure):
       self._make_ui(False, update, failure)
 
-def listen(method, url, query_string, body, respond):
-   window = Toplevel(root, width=200, height=150)
-   window.title("Notification Watcher")
-   
-   Label(window, text="URL:").grid(row=0, column=0, sticky=E)
-   Label(window, text="Query string:").grid(row=1, column=0, sticky=E)
-   Label(window, text="Request Body:").grid(row=2, column=0, sticky=E)
-   
-   mono = ("Monaco", 14)
-   
-   Label(window, text=repr(url), font=mono).grid(row=0, column=1)
-   Label(window, text=repr(query_string), font=mono).grid(row=1, column=1)
-   Label(window, text=repr(body), font=mono).grid(row=2, column=1)
-   
-   def button_clicked(count=[0]):
-      count[0] += 1
-      respond("updated", { "count" : count[0] })
-   
-   button = Button(window, text="Trigger Notification", command=button_clicked)
-   button.grid(row=3, column=1)
-   
-   def cancel_request():
-      window.destroy()
-   
-   return cancel_request
+class Backend(Component):
+   def authenticate(self, username, password):
+      d = defer.Deferred()
 
-def fetch(method, url, query_string, body):
-   d = defer.Deferred()
-   
-   request_length = len(body)
-   
-   message = """\
-Request:
-%(method)s %(url)s HTTP/1.1
-Connection: close
-Content-length: %(request_length)s
+      alert = Message(root, icon='info', type='yesno',
+         title="Dendrite: Allow authentication?",
+         message="Username: %s\nPassword: %s" % (repr(username), repr(password)),
+         detail="Some tests require that you enter valid credentials.")
+      result = alert.show()
 
-%(body)s
+      if result == 'yes':
+         d.callback({
+            "fullname" : "TkBackend Test User",
+            "username" : username,
+            "email" : "user@email.tld",
+            "status" : ""
+         })
+      elif result == 'no':
+         d.errback('Invalid username or password')
 
-(simulated) Response:
-HTTP/1.1 200 Okay
-Server: the fake one
-Content-length: 38
-
-{"DATA": [], "data_type": "task_list"}
-""" % locals()
+      return d
    
-   alert = Message(root, icon='info', type='yesno',
-      title="Dendrite: HTTP Fetch",
-      message=message)
-   result = alert.show()
-   
-   if result == 'yes':
-      d.callback({ 'data_type' : 'task_list', 'DATA': [ ] })
-   else:
-      d.errback("Fetch failed arbitrarily.")
-   return d
+   def resource(self, *args):
+      return Resource(*args)

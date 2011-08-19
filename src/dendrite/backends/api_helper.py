@@ -13,75 +13,7 @@ APIs = {
 }
 
 def custom_api(request):
-   d = defer.Deferred()
-   
-   if request["url"] == "dendrite/aboutme" and request["method"].upper() == "GET":
-      # Returns some basic information about the current user.
-      d.callback("{\"fullname\":\"Joe User\",\"email\":\"email@address.com\"}")
-      
-   elif request["url"] == "dendrite/background":
-      # Gets and sets information about background notification.
-      
-      # First, we retrieve the (hopefully cached) connection
-      # to the backend.
-      storage_backend = request['session']['storage_backend']
-      username = request['session']['username']
-      container = request['session']['container']
-      user_agent = request['session']['user_agent']
-      device_id = request['session']['device_id']
-      service = container.service(services.choose_service_for(user_agent))
-      
-      if request["method"].upper() == "GET":
-         # If we're GETTING the background information, then 
-         # ask the storage layer first.
-         result = storage_backend.get_notification_options(username)
-         
-         # If not, fallback to the service's defaults.
-         if result is None:
-            result = service.default_options()
-         
-         # Either way, set the "enabled" key to whatever the
-         # storage layer wants.
-         result['enabled'] = storage_backend.is_notifying_in_background(username)
-         
-         d.callback(json.dumps(result))
-         
-      elif request["method"].upper() == "POST":
-         try:
-            options = json.loads(request['body'])
-         except Exception:
-            d.errback(Exception('Invalid JSON: %s' % repr(request['body'])))
-         else:
-            # We're pulling the 'enabled' option out of the
-            # notifications settings because that's almost a
-            # meta-attribute: it defines whether the other 
-            # attributes are useful.
-            # 
-            # They must still be stored, however, since those
-            # attributes should still be considered
-            # "preferences" for the service.
-            # 
-            enabled = options.pop('enabled')
-            
-            # Run all validation in a service-specific manner.
-            if not service.validate_options(options):
-               d.errback(Exception('Invalid options.'))
-            else:
-               # Store all data against the server.
-               storage_backend.set_notifies_in_background (
-                 username, device_id, enabled)
-               storage_backend.set_notification_options(username, options)
-               
-               if enabled:
-                  service.add(session)
-               else:
-                  service.remove(session)
-               
-               d.callback('{}')
-   else:
-      d.errback(Exception('404 File Not Found'))
-   
-   return d
+   pass
 
 def client_side_filtering(request):
    qs = urlparse.parse_qs(request["query_string"])
