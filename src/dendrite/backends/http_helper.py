@@ -43,7 +43,6 @@ def fetch(url, contextFactory=None, post=None,
          contextFactory = ssl.ClientContextFactory()
       reactor.connectSSL(host, port, factory, contextFactory)
    elif scheme == 'http':
-      print 'connecting to %s:%i' % (host, port)
       reactor.connectTCP(host, port, factory)
    else:
       raise Exception("Invalid URL scheme: %s" % scheme)

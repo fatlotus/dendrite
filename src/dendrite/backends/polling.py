@@ -2,30 +2,30 @@ from twisted.internet import defer, reactor
 import twisted
 import re
 import json
-from dendrite.backends import api_helper, http_helper
+from dendrite.backends import http_helper
 import dendrite.diff
 import dendrite.storage
-from dendrite import container, Component
+from dendrite import container, Component, services
 import sys
+import logging
 
-LOGIN_URL = "http://localhost:8080/authenticate"
-# https://www.globusonline.org/authenticate"
+LOGIN_URL = "https://www.globusonline.org/authenticate"
 GOST_EXTRACTOR = r">GOST\.override\((.+?)\);</script>"
 SAML_EXTRACTOR = r"\Asaml=(\".+?\");"
 
 POLL_DELAY = 10
 
 APIs = {
-   "transfer" : "https://transfer.api.globusonline.org/v0.10/%s",
-   "dendrite" : None # calls api_helper.custom_api below.
+   "transfer" : "https://transfer.api.globusonline.org/v0.10/%s"
 }
 
 class Resource(object):
-   def __init__(self, auth, method, url, query_string, body):
+   def __init__(self, component, auth, method, url, query_string, body):
       """
       Initialize this resource given a source authentication
       context and REST request.
       """
+      self.component = component
       self.auth = auth
       self.method = method.upper()
       self.url = url
@@ -45,20 +45,20 @@ class Resource(object):
       
       if self.url == "dendrite/aboutme" and self.method == "GET":
          # Returns some basic information about the current user.
-         d.callback("{\"fullname\":\"Joe User\",\"email\":\"email@address.com\"}")
-      
+         d.callback({ 'fullname' : "Joe User", 'email' : "email@address.com"})
+         
       elif self.url == "dendrite/background":
          # Gets and sets information about background notification.
       
          # First, we retrieve the (hopefully cached) connection
          # to the backend.
-         storage_backend = self.storage_backend
+         storage_backend = self.component.storage_backend
          username = self.auth['username']
-         container = self.container
          user_agent = self.auth['user_agent']
          device_id = self.auth['device_id']
-         service = container.service(services.choose_service_for(user_agent))
-      
+         service_container = self.component.service_container
+         service = service_container.service(services.choose_service_for(user_agent))
+         
          if self.method == "GET":
             # If we're GETTING the background information, then 
             # ask the storage layer first.
@@ -72,7 +72,7 @@ class Resource(object):
             # storage layer wants.
             result['enabled'] = storage_backend.is_notifying_in_background(username)
          
-            d.callback(json.dumps(result))
+            d.callback(result)
          
          elif self.method == "POST":
             try:
@@ -105,13 +105,50 @@ class Resource(object):
                   else:
                      service.remove(session)
                
-                  d.callback('{}')
-      elif self.method == 'GET' and self.url == 'transfer/endpoint_list.json':
-         pass
+                  d.callback({ })
+      else:
+         # Split the URL and attempt to determine
+         # which API the end-user is requesting.
+         #
+         (api_name, remainder) = self.url.split('/', 1)
          
+         # Calculate the full URL from the API name
+         # and suffix.
+         full_url = (APIs[api_name] % remainder)
+         
+         # The assumption here is that any data send over
+         # Dendrite is encoded as form variables. Hopefully,
+         # the API doesn't need this! 
+         headers = { }
+         
+         if self.method != 'GET':
+            headers['Content-type'] = (
+             'application/x-www-form-urlencoded; charset=utf-8'
+            )
+         
+         # Add the overlay auth_token value to ensure proper
+         # authentication.
+         headers['Cookie'] = 'saml=%s' % self.auth['auth_cookie']
+         
+         # Perform the actual HTTP fetch operation.
+         d = http_helper.fetch(
+            url=str(full_url),
+            method=str(self.method),
+            postdata=str(self.body),
+            headers=headers
+         ).deferred
+         
+         d.addCallback(lambda body: json.loads(body))
       
+      # Trigger success() and failure() on the result of
+      # the deferred.
       d.addCallback(lambda body: success(body))
-      d.addErrback(lambda f: failure("RequestFailed", f.getErrorMessage()))
+      
+      def _failure(f):
+         logging.error("Request failed: %s" % f.getErrorMessage())
+         failure("RequestFailed", f.getErrorMessage())
+      
+      d.addErrback(_failure)
    
    def listen(self, update, failure):
       def cancel_and_fail(*args):
@@ -147,7 +184,7 @@ class Backend(Component):
       # simpler. If there is an HTTP "error," then we treat it as
       # a success because that's actually a redirect.
       #
-      f = http_helper.fetch(LOGIN_URL, follow_redirect=0,
+      f = http_helper.fetch(LOGIN_URL, followRedirect=0,
          post={'username' : username, 'password' : password})
       
       def success(body):
@@ -224,4 +261,4 @@ class Backend(Component):
       Create and return a Resource instance. The arguments are
       the same as with the Resource constructor.
       """
-      return Resource(*args)
+      return Resource(self, *args)
