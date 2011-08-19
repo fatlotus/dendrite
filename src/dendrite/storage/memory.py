@@ -1,6 +1,7 @@
+from dendrite import Component
+
 # How long to wait before a backend is considered
 # "dead," in seconds.
-
 EXPIRATION = 60
 
 class Record(object):
@@ -44,7 +45,7 @@ class Record(object):
       # <CLOSE TRANSACTION>
 
 
-class Database(object):
+class Database(Component):
    def __init__(self):
       self.people = { }
    
