@@ -69,7 +69,7 @@
 		7059CA1913EADB1D000C422C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		7059CA1B13EADB1D000C422C /* DendriteClientTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DendriteClientTests.h; sourceTree = "<group>"; };
 		7059CA1D13EADB1D000C422C /* DendriteClientTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DendriteClientTests.m; sourceTree = "<group>"; };
-		7059CA2B13EADBB4000C422C /* DendriteClientBundle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = DendriteClientBundle.framework; path = DendriteClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7059CA2B13EADBB4000C422C /* DendriteClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DendriteClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7059CA2C13EADBB4000C422C /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		7059CA3013EADBB4000C422C /* DendriteClientBundle-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DendriteClientBundle-Info.plist"; sourceTree = "<group>"; };
 		7059CA3213EADBB4000C422C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -161,7 +161,7 @@
 			children = (
 				7059C9FA13EADB1D000C422C /* libDendriteClient.a */,
 				7059CA0A13EADB1D000C422C /* DendriteClientTests.octest */,
-				7059CA2B13EADBB4000C422C /* DendriteClientBundle.framework */,
+				7059CA2B13EADBB4000C422C /* DendriteClient.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -347,7 +347,7 @@
 			);
 			name = DendriteClientBundle;
 			productName = DendriteClientBundle;
-			productReference = 7059CA2B13EADBB4000C422C /* DendriteClientBundle.framework */;
+			productReference = 7059CA2B13EADBB4000C422C /* DendriteClient.framework */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -493,6 +493,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -505,7 +506,7 @@
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -516,12 +517,13 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -587,6 +589,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DEAD_CODE_STRIPPING = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DendriteClientBundle/DendriteClientBundle-Prefix.pch";
@@ -608,6 +611,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DEAD_CODE_STRIPPING = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
