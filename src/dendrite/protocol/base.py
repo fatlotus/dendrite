@@ -213,7 +213,7 @@ class DendriteProtocol(protocol.Protocol):
          # Allow the adapter time to send a "failure" response,
          # if it desires, but ensure that the protocol is always
          # closed.
-         self.adapter.handle_protocol_error(exc)      
+         self.adapter.handle_protocol_error(self.global_handler, exc)      
          self.transport.loseConnection()
       else:
          
@@ -275,6 +275,12 @@ class DendriteProtocol(protocol.Protocol):
       message_body = coding.encode(argument_types, args)
       
       #LOGGING
+      # print "<- %s" % repr(dict(
+      #    id = self.outgoing_nonce,
+      #    type = message_name,
+      #    body = message_body,
+      #    reply = reply_to
+      # ))
       
       # Construct the header, and write it to the stream.
       header = (reply_to, message_type, len(message_body))
@@ -310,161 +316,172 @@ class DendriteProtocol(protocol.Protocol):
    # Called whenever there is new data to be processed on the TCP
    # stream, or whatever we're testing this against.
    def dataReceived(self, data):
-      self.buffer += data   
+      try:
+         self.buffer += data
       
-      # This is a loop to process multiple packets
-      # in a single TCP packet. After that, the 
-      # protocol is a simple two-step state
-      # machine.
-      #
-      while True:
-         # Handle the header fields first.
-         if self.header is None:
-            if len(self.buffer) >= PACKET_HEADER.size:
+         # This is a loop to process multiple packets
+         # in a single TCP packet. After that, the 
+         # protocol is a simple two-step state
+         # machine.
+         #
+         while True:
+            # Handle the header fields first.
+            if self.header is None:
+               if len(self.buffer) >= PACKET_HEADER.size:
                
-               # Unpack the message header, if possible.
-               self.header = PACKET_HEADER.unpack_from(self.buffer)
+                  # Unpack the message header, if possible.
+                  self.header = PACKET_HEADER.unpack_from(self.buffer)
                
-               # Slide the buffer forward via slices.
-               self.buffer = self.buffer[PACKET_HEADER.size:]
-            else:
-               # If the buffer is too small, then wait for more data.
-               break
-         
-         # After ensuring that we have a header, process
-         # the content of the message.
-         if self.header is not None:
-            if len(self.buffer) >= self.header[2]:
-               
-               # If possible, extract the message body given the 
-               # header information.
-               message_body = self.buffer[:self.header[2]]
-               message_id = self.incoming_nonce
-               in_reply_to = self.header[0]
-               
-               # Advance the receiving buffer (inefficiently)
-               self.buffer = self.buffer[self.header[2]:]
-               
-               # We're using the standard Pythonic style of try: action
-               # except: failure. This is somewhat slower (though the
-               # Python VM gets better jump handling every release),
-               # but it means that any uncaught failure cases are logged
-               # as such.
-               try:
-                  type_name = types.INVERTED_TYPE_IDS.get(self.header[1])
-               except KeyError:
-                  # Every individual failure case _must_ be suffixed with a 
-                  # "return" call, since handle_protocol_error does not raise
-                  # an exception.
-                  self.handle_protocol_error('Unknown type ID %i' % self.header[1])
-                  return
-               
-               #LOGGING
-               
-               # Retrieve the statically-allocated field types from the list.
-               try:
-                  argument_types = types.FIELD_TYPES[type_name]
-               except KeyError:
-                  handle_protocol_error (
-                    'No argument types for type name %s' % type_name
-                   )
-               
-               try:
-                  args = coding.decode(message_body, argument_types)
-               except ValueError, e:
-                  # The coding module should mask all other errors 
-                  # and route them to ValueErrors.
-                  self.handle_protocol_error(e)
-                  return
-               
-               # Create and save a _sender proxy object for this message.
-               sender = _sender(self, message_id)
-               
-               # A message that is its own reply is a global message.
-               #
-               # It's a bit obtuse, but it has no edge cases and means that
-               # messages are self-describing.
-               if in_reply_to == message_id:
-                  
-                  # For global messages, just look up a handle_* method and 
-                  # remember it.
-                  try:
-                     handler = getattr(self.adapter, "handle_%s" % type_name)
-                  except AttributeError:
-                     self.handle_protocol_error (
-                       'No global handler for %s messages' % type_name)
-                     return
-                  
+                  # Slide the buffer forward via slices.
+                  self.buffer = self.buffer[PACKET_HEADER.size:]
                else:
-                  # Ensure that the reply_to is actually to a message I've sent.
-                  #
-                  # These sanity checks simply provide for a modicum of early
-                  # error detection and response during development, and could
-                  # be useful in the processing of an attack.
-                  
-                  # First, check that it is a message of a parity we could have
-                  # sent.
-                  if (in_reply_to % 2) != (self.outgoing_nonce % 2):
-                     self.handle_protocol_error (
-                        'Message parity error: received message that could not '
-                        'have been sent.'
-                     )
-                     return
-                  
-                  # Now, check that it is a message that I could have sent.
-                  # 
-                  # This helps particularly with underflow, though that's
-                  # rather unlikely to occur.
-                  #
-                  if in_reply_to >= self.outgoing_nonce:
-                     self.handle_protocol_error (
-                        'Message validation error: received message that could '
-                        'not have been sent'
-                     )
-                     return
-                  
-                  # For non-global messages (replies), look up the handler and
-                  # retrieve the message.
+                  # If the buffer is too small, then wait for more data.
+                  break
+         
+            # After ensuring that we have a header, process
+            # the content of the message.
+            if self.header is not None:
+               if len(self.buffer) >= self.header[2]:
+               
+                  # If possible, extract the message body given the 
+                  # header information.
+                  message_body = self.buffer[:self.header[2]]
+                  message_id = self.incoming_nonce
+                  in_reply_to = self.header[0]
+               
+                  # Advance the receiving buffer (inefficiently)
+                  self.buffer = self.buffer[self.header[2]:]
+               
+                  # We're using the standard Pythonic style of try: action
+                  # except: failure. This is somewhat slower (though the
+                  # Python VM gets better jump handling every release),
+                  # but it means that any uncaught failure cases are logged
+                  # as such.
                   try:
-                     handlers = self.reply_handlers[in_reply_to]
-                     handler = handlers[type_name]
+                     type_name = types.INVERTED_TYPE_IDS.get(self.header[1])
                   except KeyError:
-                     self.handle_protocol_error (
-                        'No reply handler in %i '
-                        'for %s messages' % (in_reply_to, type_name)
-                     )
+                     # Every individual failure case _must_ be suffixed with a 
+                     # "return" call, since handle_protocol_error does not raise
+                     # an exception.
+                     self.handle_protocol_error('Unknown type ID %i' %
+                       self.header[1])
                      return
                   
-                  # Define a closure to handle the expectation of more data.
+                  #LOGGING
+                  # print "<- %s" % repr(dict(
+                  #    id = message_id,
+                  #    type = type_name,
+                  #    body = message_body,
+                  #    reply = in_reply_to
+                  # ))
+               
+                  # Retrieve the statically-allocated field types from the list.
+                  try:
+                     argument_types = types.FIELD_TYPES[type_name]
+                  except KeyError:
+                     handle_protocol_error (
+                       'No argument types for type name %s' % type_name
+                      )
+               
+                  try:
+                     args = coding.decode(message_body, argument_types)
+                  except ValueError, e:
+                     # The coding module should mask all other errors 
+                     # and route them to ValueErrors.
+                     self.handle_protocol_error(e)
+                     return
+               
+                  # Create and save a _sender proxy object for this message.
+                  sender = _sender(self, message_id)
+               
+                  # A message that is its own reply is a global message.
                   #
-                  # By default, this protocol forgets that it was expecting
-                  # messages unless explicitly told to re-register them. This
-                  # helps prevent garbage-collection reference loops.
-                  # 
-                  # Curiously enough, this lambda actually helps retain the
-                  # handlers by staying within the current stack context.
-                  # 
-                  # Sneaky, huh?
-                  def _closure_expect_more_messages():
-                     self.reply_handlers[in_reply_to] = handlers
-
-                  sender.expect_more = _closure_expect_more_messages
+                  # It's a bit obtuse, but it has no edge cases and means that
+                  # messages are self-describing.
+                  if in_reply_to == message_id:
                   
-                  # Forget by default.
-                  # 
-                  # Only you can prevent reference cycles.
-                  del self.reply_handlers[in_reply_to]
+                     # For global messages, just look up a handle_* method and 
+                     # remember it.
+                     try:
+                        handler = getattr(self.adapter, "handle_%s" % type_name)
+                     except AttributeError:
+                        self.handle_protocol_error (
+                          'No global handler for %s messages' % type_name)
+                        return
+                  
+                  else:
+                     # Ensure that the reply_to is actually to a message I've sent.
+                     #
+                     # These sanity checks simply provide for a modicum of early
+                     # error detection and response during development, and could
+                     # be useful in the processing of an attack.
+                  
+                     # First, check that it is a message of a parity we could have
+                     # sent.
+                     if (in_reply_to % 2) != (self.outgoing_nonce % 2):
+                        self.handle_protocol_error (
+                           'Message parity error: received message that could not '
+                           'have been sent.'
+                        )
+                        return
+                  
+                     # Now, check that it is a message that I could have sent.
+                     # 
+                     # This helps particularly with underflow, though that's
+                     # rather unlikely to occur.
+                     #
+                     if in_reply_to >= self.outgoing_nonce:
+                        self.handle_protocol_error (
+                           'Message validation error: received message that could '
+                           'not have been sent'
+                        )
+                        return
+                  
+                     # For non-global messages (replies), look up the handler and
+                     # retrieve the message.
+                     try:
+                        handlers = self.reply_handlers[in_reply_to]
+                        handler = handlers[type_name]
+                     except KeyError:
+                        self.handle_protocol_error (
+                           'No reply handler in %i '
+                           'for %s messages' % (in_reply_to, type_name)
+                        )
+                        return
+                  
+                     # Define a closure to handle the expectation of more data.
+                     #
+                     # By default, this protocol forgets that it was expecting
+                     # messages unless explicitly told to re-register them. This
+                     # helps prevent garbage-collection reference loops.
+                     # 
+                     # Curiously enough, this lambda actually helps retain the
+                     # handlers by staying within the current stack context.
+                     # 
+                     # Sneaky, huh?
+                     def _closure_expect_more_messages():
+                        self.reply_handlers[in_reply_to] = handlers
+
+                     sender.expect_more = _closure_expect_more_messages
+                  
+                     # Forget by default.
+                     # 
+                     # Only you can prevent reference cycles.
+                     del self.reply_handlers[in_reply_to]
                
-               # Trigger the handler given the origin message.
-               handler(sender, *args)
+                  # Trigger the handler given the origin message.
+                  handler(sender, *args)
                
-               # Increment the incoming message nonce.
-               self.incoming_nonce += 2
+                  # Increment the incoming message nonce.
+                  self.incoming_nonce += 2
                
-               # Clear the header fields, so that we can load another one.
-               self.header = None
+                  # Clear the header fields, so that we can load another one.
+                  self.header = None
                
-            # If nothing else, then break out of the loop. We can't parse
-            # anything more, so return to the event loop.
-            else:
-               break
+               # If nothing else, then break out of the loop. We can't parse
+               # anything more, so return to the event loop.
+               else:
+                  break
+      
+      except Exception, e:
+         self.handle_protocol_error(e)
