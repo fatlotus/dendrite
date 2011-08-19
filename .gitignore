@@ -4,3 +4,5 @@ xcuserdata
 *.xcworkspace
 .vagrant
 config/dendrite.yaml
+.coverage
+
