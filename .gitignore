@@ -6,3 +6,4 @@ xcuserdata
 config/dendrite.yaml
 .coverage
 log/*
+config/keys/
