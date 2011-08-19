@@ -5,4 +5,4 @@ xcuserdata
 .vagrant
 config/dendrite.yaml
 .coverage
-
+log/*
