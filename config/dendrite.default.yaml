@@ -34,3 +34,13 @@ accept_backlog: 1024
 # # This should be about twice the number of maximum connections,
 # # depending on average polling load.
 file_descriptor_limit: 1024
+
+# # The TLS certificate.
+# #
+# certificate_file: config/keys/localhost.crt
+
+# # The TLS private key. Note that this needs to be PKCS12-
+# # encoded, rather than the .p12 format that Apple's Keychain Access
+# # outputs.
+# #
+# private_key_file: config/keys/localhost.key

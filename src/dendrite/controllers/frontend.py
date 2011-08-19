@@ -27,7 +27,10 @@ class Controller(Component):
             pass
       return inner
    
-   def __init__(self):
+   def __init__(self,
+    certificate='config/keys/localhost.crt', 
+    private_key='config/keys/localhost.key'):
+      
       """
       Instanitate this frontend connecition controller.
       
@@ -41,8 +44,8 @@ class Controller(Component):
       """
       
       self.context_factory = ssl.DefaultOpenSSLContextFactory (
-         'config/keys/localhost.key',
-         'config/keys/localhost.crt',
+         private_key,
+         certificate,
       )
       self.stored_session_private_key = rand.bytes(1024)
    

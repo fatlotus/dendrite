@@ -20,6 +20,8 @@ def start_server(config={ }):
    fd_limit   = config.get("file_descriptor_limit", None)
    user       = config.get("user", None)
    group      = config.get("group", None)
+   cert       = config.get("certificate_file", "config/keys/localhost.crt")
+   key        = config.get("private_key_file", "config/keys/localhost.key")
    
    if sys.stdout.isatty():
       logging.basicConfig(
@@ -110,7 +112,7 @@ def start_server(config={ }):
    if url:
       logging.info("Opening front-facing Dendrite instance on %s..." % url)
       
-      controller = frontend.Controller()
+      controller = frontend.Controller(certificate=cert, private_key=key)
       component_group.add(controller)
       
    component_group.initialize()
