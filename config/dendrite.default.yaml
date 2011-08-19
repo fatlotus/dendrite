@@ -3,21 +3,22 @@
 # Main Dendrite configuration file
 ---
 # # 
-# # The TCP/IP port to listen on (default: 1337).
+# # The URL to listen on (default: ssl://0.0.0.0:1337).
 # # 
 # # As with anything on UNIX, you need to enable the "user"
-# # property to use a port below 1024.
+# # property to use a port below 1024 if you're using TCP
+# # or SSL.
 # # 
 # # If this property is disabled, this instance acts as a
 # # stateless "slave" node that merely manages polling.
 # #
-listen_port: 1337
+listen_url: ssl://0.0.0.0:1337
 
 # # The setuid() user to run as (either a UID or a name).
 # # 
 # # This property is required if you are running Dendrite as root.
 # # 
-user: jarcher
+# user: username
 
 # # The setgrp() group to run as (either a GID or a name).
 # # 
@@ -33,14 +34,3 @@ accept_backlog: 1024
 # # This should be about twice the number of maximum connections,
 # # depending on average polling load.
 file_descriptor_limit: 1024
-
-# # Log all packets sent and received from this server.
-# # 
-# # This shows _all_ the information from the protocol, including
-# # computed packet IDs.
-# log_packets: false
-
-# # Delay between every heartbeat message sent to the client.
-# #
-# # If this is not specified, then the server will not send heartbeats.
-# heartbeat_every: 30
