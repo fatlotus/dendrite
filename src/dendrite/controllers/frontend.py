@@ -4,12 +4,13 @@ from twisted.internet import defer, ssl
 from OpenSSL import rand
 import logging
 from dendrite.controllers import session_helper
+from dendrite import Component
 
-class Controller(object):
+class Controller(Component):
    # Helper annotations and functions
    def secure(func):
       def inner(self, sender, *vargs, **dargs):
-         if sender.session['backend_info'] is not None:
+         if sender.session['auth'] is not None:
             return func(self, sender, *vargs, **dargs)
          else:
             sender.failure (
@@ -20,22 +21,25 @@ class Controller(object):
    
    def curry(self, sender, func):
       def inner(*vargs, **dargs):
-         if sender.session['backend_info'] is not None:
+         if sender.session['auth'] is not None:
             return func(*vargs, **dargs)
          else:
             pass
       return inner
    
-   def __init__(self, api_backend, storage_backend):
+   def __init__(self):
       """
-      Instantiate this frontend instance given an API and
-      generic storage backend. This method also initializes
-      the SSL context factory, which caches the certificate
-      and private key for the duration of the server 
-      instance lifecycle.
+      Instanitate this frontend connecition controller.
+      
+      Each controller object handles many individual
+      connections and login sessions, so we cannot trust
+      instance variables with user-specific state.
+      
+      This method also initializes the SSL context factory,
+      which caches the certificate and private key for the
+      duration of the server instance lifecycle.
       """
-      self.storage_backend = storage_backend
-      self.api_backend = api_backend
+      
       self.context_factory = ssl.DefaultOpenSSLContextFactory (
          'config/keys/localhost.key',
          'config/keys/localhost.crt',
@@ -52,6 +56,18 @@ class Controller(object):
       
       return self.context_factory.getContext()
    
+   def handle_protocol_error(self, sender, err):
+      """
+      Handles a protocol error. The base.py module will close
+      the connection regardless of what happens in this method,
+      so this method is more for reporting of the error than 
+      cleanup.
+      """
+      
+      logging.error("Protocol error: %s" % repr(err))
+      
+      sender.failure("ProtocolError", "A protocol error has occured.")
+   
    def connected(self, sender):
       """
       This method is called by base.DendriteProtocol whenever a
@@ -66,7 +82,7 @@ class Controller(object):
       
       # Initialize the per-connection session.
       sender.session['identcback'] = defer.Deferred()
-      sender.session['backend_info'] = None
+      sender.session['auth'] = None
       
       # Default behaviour to require a identity before
       # any sort of request. Thus, send a request and only
@@ -85,12 +101,14 @@ class Controller(object):
       """
       
       def try_authentication(identity):
-         def authentication_success(session):
-            sender.session['backend_info'] = session
+         def authentication_success(authctx):
+            sender.session['auth'] = authctx
+            sender.session['auth']['device_id'] = sender.session['device_id']
+            sender.session['auth']['user_agent'] = sender.session['user_agent']
             sender.success()
       
          def authentication_failed(exc):
-            sender.session['backend_info'] = None
+            sender.session['auth'] = None
             sender.failure('AuthenticationFailed', 'Invalid username or password.')
             return ""
          
@@ -110,10 +128,10 @@ class Controller(object):
       backend. See the protocol specification for details.
       """
       
-      session = sender.session['backend_info']
-      req = self.api_backend.Request(session, method, url, query_string, body)
+      session = sender.session['auth']
+      resource = self.api_backend.resource(session, method, url, query_string, body)
       
-      req.fetch (
+      resource.fetch (
          self.curry(sender, sender.data),
          self.curry(sender, sender.failure)
       )
@@ -127,15 +145,16 @@ class Controller(object):
       
       See the specification for more details.
       """
-      session = sender.session['backend_info']
-      req = self.api_backend.Request(session, method, url, query_string, body)
       
-      req.listen (
+      session = sender.session['auth']
+      resource = self.api_backend.resource(session, 'GET', url, query_string, '')
+      
+      resource.listen (
          self.curry(sender, sender.notify),
          self.curry(sender, sender.failure)
       )
       
-      sender.success(cancel=req.cancel)
+      sender.success(cancel=lambda sender: resource.cancel())
    
    @secure
    def handle_session(self, sender):
@@ -147,10 +166,21 @@ class Controller(object):
       """
       
       # Extract the login-relevant subsession.
-      login_session = sender.session['backend_info']
+      login_session = sender.session['auth']
       
       # Call the session helper to decrypt the data.
       data = session_helper.save(self.stored_session_private_key, login_session)
       
       # Return it to the client.
       sender.text(data)
+   
+   def handle_restore(self, value):
+      """
+      An unsecured API handler that restores only the authentication
+      portion of a saved session handler. Right now, restoration is
+      hard-disabled pending a proper security review.
+      """
+      
+      logging.warn("Restore method called but it is disabled.")
+      
+      sender.failure()
