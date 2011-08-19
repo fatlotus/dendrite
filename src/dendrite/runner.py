@@ -1,8 +1,8 @@
 from dendrite.protocol import base
 from dendrite.controllers import frontend
 from dendrite.backends import polling
-from dendrite.container import stub
-from dendrite.storage import memory
+from dendrite.container import memory as memory_container
+from dendrite.storage import memory as memory_storage
 from dendrite import ComponentGroup
 import resource
 from twisted.internet import reactor
@@ -32,11 +32,11 @@ def start_server(config={ }):
          format="%(asctime)s %(levelname)10s | %(message)s",
          filename="log/errors.log", level=logging.INFO)
    
-   group = ComponentGroup()
+   component_group = ComponentGroup()
    
-   group.add(polling.Backend(), name="api_backend")
-   group.add(memory.Database(), name="storage_backend")
-   group.add(stub.Container(), name="service_container")
+   component_group.add(polling.Backend(), name="api_backend")
+   component_group.add(memory_storage.Database(), name="storage_backend")
+   component_group.add(memory_container.Container(), name="service_container")
    
    header = """\
 +------------------------+
@@ -92,10 +92,10 @@ def start_server(config={ }):
    
    if group is not None:
       try:
-         group_id = grp.getgrgid(int(user))[2]
+         group_id = grp.getgrgid(int(group))[2]
       except ValueError:
          try:
-            group_id = grp.getgrnam(user)[2]
+            group_id = grp.getgrnam(group)[2]
          except KeyError:
             logging.fatal("Unknown group name %s." % repr(group))
             return 1
@@ -110,13 +110,13 @@ def start_server(config={ }):
    if url:
       logging.info("Opening front-facing Dendrite instance on %s..." % url)
       
-      controller = frontend.Controller(api_backend, storage_backend)
+      controller = frontend.Controller()
+      component_group.add(controller)
       
-      base.DendriteProtocol.listen(reactor, url, controller, backlog=backlog)
-      
-      group.add(controller)
+   component_group.initialize()
    
-   group.initialize()
+   if url:
+      base.DendriteProtocol.listen(reactor, url, controller, backlog=backlog)
    
    logging.info("Dendrite started.")
    

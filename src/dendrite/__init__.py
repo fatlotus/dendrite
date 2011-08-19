@@ -58,5 +58,4 @@ class ComponentGroup(object):
             setattr(component, name, value)
       
       for component in self.components:
-         print repr(component.__class__)
          component.initialize()
