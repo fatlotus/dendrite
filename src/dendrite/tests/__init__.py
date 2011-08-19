@@ -1,4 +1,4 @@
-from nose.twistedtools import reactor, deferred
+from nose.twistedtools import reactor
 import os
 
 try:

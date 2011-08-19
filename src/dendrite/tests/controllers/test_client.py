@@ -26,9 +26,9 @@ class Controller(object):
    
    def connected(self, sender):
       def success(*vargs):
+         self.event("success")
          return self.shutdown (
             'Allowed to perform action without authentication.')
-         self.event("success")
       
       def failure1(sender2, failure, message):
          def failure2(sender3, failure, message):
@@ -42,7 +42,7 @@ class Controller(object):
          sender.listen('', '',
             failure=failure2,
             success=success,
-            listen=success
+            notify=success
          )
          
          self.event("failure1")
