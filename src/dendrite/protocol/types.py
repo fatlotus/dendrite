@@ -12,12 +12,14 @@ FIELD_TYPES = {
    "cancel" : (),
    "notify" : (str, dict),
    "session" : (),
+   "restore" : (str,),
+   "text" : (str,),
    "up" : ('unsigned',),
    "down" : ('unsigned',),
    "node" : (str, 'unsigned'),
    "services" : (),
    "service" : (dict),
-   "count" : ('unsigned',)
+   "count" : ('unsigned',),
 }
 
 TYPE_IDS = {
@@ -33,12 +35,14 @@ TYPE_IDS = {
    "cancel" : 0x5,
    "notify" : 0x4,
    "session" : 0x6,
+   "restore" : 0x7,
    "up" : 0xE,
    "down" : 0xF,
    "node" : 0x10,
    "services" : 0x11,
    "service" : 0x12,
-   "count" : 0x13 
+   "count" : 0x13,
+   "text" : 0x14,
 }
 
 INVERTED_TYPE_IDS = dict([v,k] for k,v in TYPE_IDS.items())
