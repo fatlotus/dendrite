@@ -22,6 +22,7 @@ def start_server(config={ }):
    group      = config.get("group", None)
    cert       = config.get("certificate_file", "config/keys/localhost.crt")
    key        = config.get("private_key_file", "config/keys/localhost.key")
+   log_file   = config.get("logging_file", "log/dendrite.log")
    
    if sys.stdout.isatty():
       logging.basicConfig(
@@ -32,7 +33,7 @@ def start_server(config={ }):
       logging.basicConfig(
          datefmt="%m-%d %H:%M:%S %Z",
          format="%(asctime)s %(levelname)10s | %(message)s",
-         filename="log/errors.log", level=logging.INFO)
+         filename=log_file, level=logging.INFO)
    
    component_group = ComponentGroup()
    

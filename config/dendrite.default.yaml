@@ -44,3 +44,10 @@ file_descriptor_limit: 1024
 # # outputs.
 # #
 # private_key_file: config/keys/localhost.key
+
+# # The file to write configuration to.
+# #
+# # There is no support for log rotation in Dendrite yet. Thus far, 
+# # most Dendrite servers have not had a very high uptime.
+# #
+# logging_file: log/dendrite.log
