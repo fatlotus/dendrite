@@ -1,7 +1,0 @@
-instances:
-- name: host0
-  address: unix://tmp/host_0.sock
-- name: host1
-  address: unix://tmp/host_1.sock
-- name: host2
-  address: unix://tmp/host_2.sock
