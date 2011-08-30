@@ -11,4 +11,5 @@ setup(
    packages='dendrite',
    url='http://www.github.com/globusonline/dendrite',
    package_dir={ '' : 'src' },
+   scripts=['script/launch'],
 )
