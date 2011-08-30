@@ -1,22 +1,25 @@
-from Tkinter import *
-from tkCommonDialog import Dialog
-from twisted.internet import defer, tksupport, reactor
+import sys
 import json
 from dendrite import Component
 
-root = Tk()
-root.withdraw()
+if 'nose' not in sys.modules:
+   from Tkinter import *
+   from tkCommonDialog import Dialog
+   from twisted.internet import defer, tksupport, reactor
 
-tksupport.install(root)
+   root = Tk()
+   root.withdraw()
 
-def better_exit():
-   root.destroy()
-   reactor.stop()
+   tksupport.install(root)
 
-root.createcommand('exit', better_exit)
+   def better_exit():
+      root.destroy()
+      reactor.stop()
 
-class Message(Dialog):
-   command = "tk_messageBox"
+   root.createcommand('exit', better_exit)
+
+   class Message(Dialog):
+      command = "tk_messageBox"
 
 class Resource(object):
    def __init__(self, session, method, url, query_string, body):
