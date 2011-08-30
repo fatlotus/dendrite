@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env python
 # Main Dendrite launcher.
 #
 # This script basically just acts as a UNIX-friendly
