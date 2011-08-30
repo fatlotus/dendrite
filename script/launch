@@ -1,7 +1,23 @@
 #!/usr/bin/env python
 # Main Dendrite launcher.
-#
-# This script basically just acts as a UNIX-friendly
-# wrapper around the python interpreter.
+# 
+# This script executes Dendrite with the proper 
+# sys.path value and does any other necessary
+# setup.
 
-PYTHONPATH=src:lib python src/dendrite
+import sys
+import os
+
+root_directory = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+if not 'DENDRITE' in os.environ:
+   os.environ['DENDRITE_PATH'] = root_directory
+
+sys.path.extend((
+   '%s/src' % root_directory,
+   '%s/lib' % root_directory
+))
+
+import dendrite.__main__
+
+sys.exit(dendrite.__main__.main(*sys.argv[1:]))
