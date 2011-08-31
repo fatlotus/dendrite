@@ -159,10 +159,10 @@ class Resource(object):
          def differencing(body):
             changes = dendrite.diff.diff(content, body)
             
-            for (kind, data) in changes:
-               update(kind, data)
-            
             if not self.cancelled:
+               for (kind, data) in changes:
+                  update(kind, data)
+               
                reactor.callLater(POLL_DELAY, set_initial_content, content)
          self.fetch(differencing, failure)
       
