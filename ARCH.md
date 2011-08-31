@@ -14,19 +14,19 @@ A few examples of controllers:
 
 * `dendrite.backends` This component provides an interface to whatever REST backend we are calling. This provides a basic interface in the form of a class `dendrite.backends.backend_name.Backend` that has the following interface:
 	
-	* `#authenticate(username, password)` -> (deferred) authentication session. The t-.i-.p-.Defer instance returned should either return a dict that contains implementation-specific login state or a failure message.
+	* `#authenticate(username, password) -> (deferred) authentication session`. The `t-.i-.p-.Defer` instance returned should either return a dict that contains implementation-specific login state or a failure message.
 	
-	* `#resource(auth_session, method, url, query_string, body)` -> a `Resource` object, as documented below. Resources should only be used for a single request __or__ a single listen. Invoking both or calling another on a cancelled Resource is undefined behavior.
+	* `#resource(auth_session, method, url, query_string, body) -> a Resource object`, as documented below. Resources should only be used for a single request __or__ a single listen. Invoking both or calling another on a cancelled Resource is undefined behavior.
 		
 		* `#fetch(success, failure)` fetches this resource once and calls `success(data)` on successful completion, and `failure(err, message)` if the request fails.
 		
-		* `#success(update, failue)` begins listening to this resource and calls `update(type, data)` whenever the resource has changed (using the inteligent differencing helper, see below). If the listening fails, then `failure(err, data)` is called, though this does not necessarily `#cancel()` this request.
+		* `#listen(update, failue)` begins listening to this resource and calls `update(type, data)` whenever the resource has changed (using the inteligent differencing helper, see below). If the listening fails, then `failure(err, data)` is called, though this does not necessarily `#cancel()` this request.
 		
 		* `#cancel()` cancels any listening that may be occuring on this Resource. No further updates should be sent once a request has been cancelled.
 
 * `dendrite.container` provides a component to handle the organization and structure of long-running stateful `Service`'s across a Dendrite cluster. This is useful largely to pool expensive resources such as APNS sockets and other multiplexed streams. Right now, only a local in-memory `Container` is implemented, and it is according to the interface below:
 	
-	* `#service(service_class)` -> instance of `service_class` This method retrieves an instance of `service_class` from the container. If it hasn't already been instantiated, then this service instantiates it.
+	* `#service(service_class) -> instance of service_class` This method retrieves an instance of `service_class` from the container. If it hasn't already been instantiated, then this service instantiates it.
 
 Helpers
 -------
