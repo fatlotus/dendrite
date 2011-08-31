@@ -8,62 +8,19 @@ class Record(object):
    def __init__(self, database, username, identifier):
       # Create a new SQL-like record object.
       # 
-      # "Identifier" should be a tuple (kind, data)
+      # "Identifier" should be a tuple (type, id)
       # explaining the device type and device ID.
       self.identifier = identifier
       self.username = username
       self.database = database
       self.options = { }
-      self.last_updated = 0
-   
-   def refresh(self):
-      # Consider this node "updated." The backend
-      # should periodically call this method to
-      # indicate active status.
-      self.last_updated = time.time()
-   
-   def is_expired(self):
-      # Consider this node dead if the backend has stopped 
-      # responding or is having clock issues.
-      
-      return (
-         (self.last_updated < (time.time() - EXPIRATION)) or 
-         (self.last_updated > (time.time() + 30))
-      )
-   
-   def expire(self):
-      # <OPEN TRANSACTION>
-      self.last_updated = 0
-      # <CLOSE TRANSACTION>
-   
-   def is_cancelled(self):
-      return (self.username in self.database.people)
    
    def cancel(self):
-      # <OPEN TRANSACTION>
       del self.database.people[self.username]
-      # <CLOSE TRANSACTION>
-
 
 class Database(Component):
    def __init__(self):
       self.people = { }
-   
-   # Retrieves "count" devices from the queue.
-   def retrieve_devices(self, count=100):
-      results = [ ]
-      
-      # <OPEN TRANSACTION>
-      for record in self.people.values():
-         if record.is_expired():
-            record.refresh()
-            results.append(record)
-            
-            if len(results) >= count:
-               break
-      # <CLOSE TRANSACTION>
-      
-      return results
    
    # Sets whether the given person is listening for 
    # background notification. We don't necessarily claim it:
@@ -71,9 +28,7 @@ class Database(Component):
    # processor.
    def set_notifies_in_background(self, username, deviceID, notifies):
       if notifies:
-         # <OPEN TRANSACTION>
          self.people[username] = Record(self, username, deviceID)
-         # <CLOSE TRANSACTION>
       elif username in self.people:
          self.people[username].cancel()
    
