@@ -12,6 +12,7 @@ class Record(object):
       self.username = username
       self.database = database
       self.options = { }
+      self.enabled = True
    
    def cancel(self):
       """
@@ -19,7 +20,7 @@ class Record(object):
       may be more operation required than a mere database update, this
       is stubbed out to allow for more complex logic here.
       """
-      del self.database.people[self.username]
+      self.enabled = False
 
 class Database(Component):
    def __init__(self):
@@ -28,28 +29,31 @@ class Database(Component):
    def set_notifies_in_background(self, username, deviceID, notifies):
       """
       Sets whether the given person is listening for 
-      background notification. We don't necessarily claim it:
-      it might be good to have a non-front-facing notification
-      processor.
+      background notification on the specified device.
+      
+      The deviceID argument should be a tuple (type, ID)
+      that contains both the UserAgent and device-specific
+      identifier that we want.
       """
       if notifies:
-         self.people[username] = Record(self, username, deviceID)
+         if username not in self.people:
+            self.people[username] = Record(self, username, deviceID)
+         
       elif username in self.people:
-         self.people[username].cancel()
+         if username in self.people:
+            self.people[username].cancel()
    
    def is_notifying_in_background(self, username):
       """
-      Is this person requesting notifications?
-      
-      Note that "requesting notifications" and "receiving them"
-      are two entirely different states.
+      Returns true if the user is registered as having
+      requested background notifications.
       """
       return username in self.people
    
    def get_notification_options(self, username):
       """
-      This method returns the current notifications configuration
-      that the end-user has created.
+      Returns the current device-specific options that the end-user
+      has specified to send notifications.
       """
       if username in self.people:
          return self.people[username].options.copy()
