@@ -49,7 +49,7 @@ There are several steps required before getting a fully up-and-running Dendrite 
 	
 	Most of the configuration options in `config/dendrite.yaml` are pretty self-explanatory, but the most important options are detailed below.
 	
-	* `listen_url`: The URL to listen on. This only supports TCP streams (`tcp://host:port`), TLS over TCP (`ssl://host:port`) and UNIX domain sockets (`unix://relative/path/to/socket`, see [note below][note1]). Dendrite, by default, runs on `ssl://*:1336`, and it's generally best to keep it at that. If you wish to run on a port under 1024, then you'll have to launch the server with root privileges (see note below).
+	* `listen_url`: The URL to listen on. This only supports TCP streams (`tcp://host:port`), TLS over TCP (`ssl://host:port`) and UNIX domain sockets (`unix://relative/path/to/socket`, see note below). Dendrite, by default, runs on `ssl://*:1336`, and it's generally best to keep it at that. If you wish to run on a port under 1024, then you'll have to launch the server with root privileges (see note below).
 		
 		Examples:
 		
