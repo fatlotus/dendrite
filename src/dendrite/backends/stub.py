@@ -21,7 +21,8 @@ class Resource(object):
    
    def listen(self, update, failure):
       # Invoke update(type, newdata) when the resource is updated,
-      # and failure(err, message) when something fails.
+      # and failure(err, message) when something fails. Note that it 
+      # _should not_ cancel the listener. 
       
       self.timer = reactor.callLater(5, self._update, update)
    
