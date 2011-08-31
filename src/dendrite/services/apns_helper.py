@@ -162,7 +162,7 @@ class APNProtocol(protocol.Protocol):
       a connectSSL call.
       
       If you'd like, you can wait for the #deferred property on the returned
-      Factory subclass to populate to get the new protocol instance.
+      Factory subclass to get the new protocol instance.
       """
       
       class _Factory(protocol.ClientFactory, ssl.ClientContextFactory):
