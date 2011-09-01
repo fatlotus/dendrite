@@ -358,7 +358,7 @@ class DendriteProtocol(protocol.Protocol):
    # Called whenever there is new data to be processed on the TCP
    # stream, or whatever we're testing this against.
    def dataReceived(self, data):
-      def loggingContext():
+      def logging_context():
          try:
             self.buffer += data
       
