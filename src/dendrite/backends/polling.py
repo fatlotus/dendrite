@@ -104,9 +104,9 @@ class Resource(object):
                   storage_backend.set_notification_options(username, options)
                
                   if enabled:
-                     service.add(session)
+                     service.add(self.auth)
                   else:
-                     service.remove(session)
+                     service.remove(self.auth)
                
                   d.callback({ })
       else:
