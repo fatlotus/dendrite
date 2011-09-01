@@ -6,7 +6,7 @@
 # information about all the various packet
 # fields and options.
 
-from twisted.internet import protocol, ssl, address
+from twisted.internet import protocol, ssl, address, failure
 import struct
 from dendrite.protocol import types, coding
 import urlparse
@@ -528,6 +528,6 @@ class DendriteProtocol(protocol.Protocol):
                      break
          
          except Exception, e:
-            self.handle_protocol_error(e)
+            self.handle_protocol_error(failure.Failure())
          
       logger.with_context(self.peer_name_url, logging_context)
