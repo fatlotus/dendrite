@@ -1,15 +1,16 @@
 from nose.twistedtools import deferred, reactor
+from nose.tools import *
+from nose.plugins.attrib import attr
+
 from dendrite.protocol import base
-from dendrite.tests.controllers import test_client
 from dendrite.controllers import frontend
 from dendrite.backends import stub, polling
 from dendrite.storage import memory as memory_storage
 from dendrite.container import memory as memory_container
 from dendrite import ComponentGroup
-from nose.tools import *
-from nose.plugins.attrib import attr
-import time
-import hashlib
+
+from dendrite.tests.stubs import stub_client
+from dendrite.tests import socket_helper
 
 servers = [ ]
 clients = [ ]
@@ -49,11 +50,7 @@ def integrate(controller=None, **dargs):
    if "service_container" not in dargs:
       dargs["service_container"] = memory_container.Container()
    
-   nonce += 1
-   
-   filename = ("tmp/%s.sock" %
-      hashlib.sha1('%s-%s' % (nonce, time.time())).hexdigest()[:20]
-   )
+   filename = socket_helper.generate_test_socket()
    
    group = ComponentGroup()
    group.add(controller)
@@ -63,7 +60,7 @@ def integrate(controller=None, **dargs):
    
    group.initialize()
    
-   test_bench = test_client.Controller()
+   test_bench = stub_client.Controller()
    
    server_factory = base.DendriteProtocol.build_factory(
     controller, is_initiator=False)
