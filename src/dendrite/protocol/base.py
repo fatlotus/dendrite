@@ -530,4 +530,4 @@ class DendriteProtocol(protocol.Protocol):
          except Exception, e:
             self.handle_protocol_error(e)
          
-      logging.with_context(self.peer_name_url, logging_context)
+      logger.with_context(self.peer_name_url, logging_context)
