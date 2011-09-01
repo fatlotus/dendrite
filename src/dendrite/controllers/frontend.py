@@ -98,6 +98,11 @@ class Controller(Component):
       # Bother the client asynchronously.
       sender.identify(identity=got_identity)
       
+      logging.info('Connected.')
+   
+   def disconnected(self, sender, reason):
+      logging.info('Disconnected: %s' % reason)
+   
    def handle_login(self, sender, username, password):
       """
       Handle a login request.
