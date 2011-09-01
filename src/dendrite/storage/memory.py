@@ -34,7 +34,7 @@ class Database(Component):
       """
       if notifies:
          if username not in self.people:
-            self.people[username] = Record(self, username, deviceID)
+            self.people[username] = Record(self, username, device)
          else:
             self.people[username].device = device
          
