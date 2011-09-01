@@ -88,6 +88,12 @@ class DendriteProtocol(protocol.Protocol):
       # none to reply to.
       self.global_handler = _sender(self, None)
       
+      # The default printing format of addresses is ugly, so
+      # we're printing it as a URL to be consistent with
+      # -.listen and -.connect. This allows for more compact 
+      # logging as well.
+      self.peer_name_url = ''
+      
    ### Public API ###
    #
    
@@ -301,17 +307,51 @@ class DendriteProtocol(protocol.Protocol):
    # sending the initial TLS request and beginning
    # protocol interchange.
    def connectionMade(self):
-      if hasattr(self.adapter, 'connected'):
-         logger.with_context(self.transport.getPeer(),
-            self.adapter.connected, self.global_handler)
       
+      # Generate a peer URL given a transport and remote address.
+      #
+      # These URLs are of the same form as in -.listen and#
+      # -.connect.
+      transport = self.transport
+      peer = self.transport.getPeer()
+      
+      # Duck-type for various address types, because isinstance()
+      # is evil.
+      if hasattr(peer, 'port'):
+         # TCP and UDP sockets, though Dendrite currently only
+         # supports TCP.
+         address = '%s:%s' % (peer.host, peer.port)
+         protocol = peer.type.lower()
+         
+      elif hasattr(peer, 'name'):
+         # UNIX Domain sockets.
+         address = peer.name
+         protocol = 'unix'
+         
+      else:
+         # Anything else.
+         raise Exception('Unknown address type %s' % peer.__class__)
+      
+      # Duck-type for an SSL transport.
+      if hasattr(transport, 'getPeerCertificate'):
+         # SSL is considered a meta-protocol, so override the
+         # "protocol" field if we're using encryption.
+         protocol = 'ssl'
+      
+      # Generate a peer url given the protocol and address.
+      self.peer_name_url = '%s://%s' % (protocol, address)
+      
+      # Trigger the callback in the adapter.      
+      if hasattr(self.adapter, 'connected'):
+         logger.with_context(self.peer_name_url,
+            self.adapter.connected, self.global_handler)
    
    # Called whenever the connection is lost, for whatever
    # reason. This should be used for general cleanup information
    # and logging, depending on what "reason" is.
    def connectionLost(self, reason):
       if hasattr(self.adapter, 'disconnected'):
-         logger.with_context(self.transport.getPeer(),
+         logger.with_context(self.peer_name_url,
             self.adapter.disconnected, self.global_handler, reason)
    
    
@@ -490,4 +530,4 @@ class DendriteProtocol(protocol.Protocol):
          except Exception, e:
             self.handle_protocol_error(e)
          
-      logging.with_context(self.transport.getPeer(), logging_context)
+      logging.with_context(self.peer_name_url, logging_context)
