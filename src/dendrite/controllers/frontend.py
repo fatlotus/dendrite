@@ -13,7 +13,10 @@ class Controller(Component):
          if sender.session['auth'] is not None:
             return func(self, sender, *vargs, **dargs)
          else:
-            raise Exception('Authentication is required for %s(..)' % func.name)
+            sender.failure('LoginRequired', 'That API call requires authentication.')
+            logging.error('Attempted to access %s(..) without authentication' %
+              func.__name__)
+            # sender.close()
       return inner
    
    def curry(self, sender, func):
