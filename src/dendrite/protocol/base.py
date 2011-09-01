@@ -6,7 +6,8 @@
 # information about all the various packet
 # fields and options.
 
-from twisted.internet import protocol, ssl, address, failure
+from twisted.internet import protocol, ssl, address
+from twisted.python import failure
 import struct
 from dendrite.protocol import types, coding
 import urlparse
@@ -43,6 +44,10 @@ class _sender(object):
       else:
          # Otherwise just set it to self.
          self.origin = self
+   
+   # Closes the connection to the foreign peer.
+   def close(self):
+      self.protocol.transport.loseConnection()
    
    # This class method installs a proxy method for the
    # specified protocol message type name.
@@ -431,7 +436,7 @@ class DendriteProtocol(protocol.Protocol):
                      except ValueError, e:
                         # The coding module should mask all other errors 
                         # and route them to ValueErrors.
-                        self.handle_protocol_error(e)
+                        self.handle_protocol_error(failure.Failure(e))
                         return
                
                      # Create and save a _sender proxy object for this message.
