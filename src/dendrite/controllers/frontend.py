@@ -64,7 +64,9 @@ class Controller(Component):
       cleanup.
       """
       
-      logging.error("Protocol error: %s" % repr(err))
+      error = 'Protocol error: %s\n%s' % (err.getErrorMessage(), err.getTraceback)
+      
+      logging.error(error)
       
       sender.failure("ProtocolError", "A protocol error has occured.")
    
