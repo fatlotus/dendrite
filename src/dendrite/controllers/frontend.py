@@ -13,10 +13,7 @@ class Controller(Component):
          if sender.session['auth'] is not None:
             return func(self, sender, *vargs, **dargs)
          else:
-            sender.failure (
-              "AuthenticationRequired",
-              "That request requires authentication."
-            )
+            raise Exception('Authentication is required for %s(..)' % func.name)
       return inner
    
    def curry(self, sender, func):
@@ -91,6 +88,8 @@ class Controller(Component):
       # any sort of request. Thus, send a request and only
       # then trigger the Deferred from it.
       def got_identity(sender, user_agent, device_id):
+         logging.info('User-agent: %s' % repr(user_agent))
+         logging.info('Device-id:  %s' % repr(device_id))
          sender.session['user_agent'] = user_agent
          sender.session['device_id'] = device_id
          sender.session['identcback'].callback(True)
@@ -110,12 +109,16 @@ class Controller(Component):
       
       def try_authentication(identity):
          def authentication_success(authctx):
+            logging.info('Login success for %s' % repr(username))
+            
             sender.session['auth'] = authctx
             sender.session['auth']['device_id'] = sender.session['device_id']
             sender.session['auth']['user_agent'] = sender.session['user_agent']
             sender.success()
       
          def authentication_failed(exc):
+            logging.info('Login failed for %s' % repr(username))
+            
             sender.session['auth'] = None
             sender.failure('AuthenticationFailed', 'Invalid username or password.')
             return ""
