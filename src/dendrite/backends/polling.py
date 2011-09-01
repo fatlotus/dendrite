@@ -58,6 +58,7 @@ class Resource(object):
          device_id = self.auth['device_id']
          service_container = self.component.service_container
          service = service_container.service(services.choose_service_for(user_agent))
+         device = (user_agent, device_id)
          
          if self.method == "GET":
             # If we're GETTING the background information, then 
@@ -70,8 +71,10 @@ class Resource(object):
          
             # Either way, set the "enabled" key to whatever the
             # storage layer wants.
-            result['enabled'] = storage_backend.is_notifying_in_background(username)
-         
+            result['enabled'] = storage_backend.is_notifying_in_background (
+               username, device
+            )
+            
             d.callback(result)
          
          elif self.method == "POST":
@@ -97,7 +100,7 @@ class Resource(object):
                else:
                   # Store all data against the server.
                   storage_backend.set_notifies_in_background (
-                    username, device_id, enabled)
+                    username, device, enabled)
                   storage_backend.set_notification_options(username, options)
                
                   if enabled:

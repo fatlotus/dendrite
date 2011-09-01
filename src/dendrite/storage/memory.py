@@ -1,14 +1,11 @@
 from dendrite import Component
 
 class Record(object):
-   def __init__(self, database, username, identifier):
+   def __init__(self, database, username, device):
       """
       Create a new SQL-like record object.
-      
-      "Identifier" should be a tuple (type, id)
-      explaining the device type and device ID.
       """
-      self.identifier = identifier
+      self.device = device
       self.username = username
       self.database = database
       self.options = { }
@@ -26,7 +23,7 @@ class Database(Component):
    def __init__(self):
       self.people = { }
    
-   def set_notifies_in_background(self, username, deviceID, notifies):
+   def set_notifies_in_background(self, username, device, notifies):
       """
       Sets whether the given person is listening for 
       background notification on the specified device.
@@ -38,17 +35,20 @@ class Database(Component):
       if notifies:
          if username not in self.people:
             self.people[username] = Record(self, username, deviceID)
+         else:
+            self.people[username].device = device
          
       elif username in self.people:
-         if username in self.people:
+         if username in self.people and self.people[username].device == device:
             self.people[username].cancel()
    
-   def is_notifying_in_background(self, username):
+   def is_notifying_in_background(self, username, device):
       """
       Returns true if the user is registered as having
-      requested background notifications.
+      requested background notifications to the specified
+      device.
       """
-      return username in self.people
+      return username in self.people and self.people[username].device == device
    
    def get_notification_options(self, username):
       """
